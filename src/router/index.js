@@ -17,7 +17,9 @@ const AttendanceStatistics = () =>
 const AttendanceTypeDetails = () =>
     import ('@/pages/auxiliarySystem/AttendanceTypeDetails')
 const PersonnelStatisticsDetails = () =>
-    import ('@/pages/auxiliarySystem/PersonnelStatisticsDetails')               
+    import ('@/pages/auxiliarySystem/PersonnelStatisticsDetails')
+const SubmitSuccessfully = () =>
+    import ('@/pages/auxiliarySystem/SubmitSuccessfully')              
 const Login = () =>
     import ('@/pages/Login')
 const MyInfo = () =>
@@ -72,6 +74,11 @@ let baseRoute = [{
         path: '/personnelStatisticsDetails',
         name: 'personnelStatisticsDetails',
         component: PersonnelStatisticsDetails
+    },
+    {
+        path: '/submitSuccessfully',
+        name: 'submitSuccessfully',
+        component: SubmitSuccessfully
     }
 ];
 let router = new Router({
