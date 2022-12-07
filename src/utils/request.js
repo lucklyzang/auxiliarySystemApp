@@ -2,6 +2,7 @@ import axios from 'axios'
 import store from '@/store'
 import router from '../router'
 import Vue from 'vue';
+import { removeAllLocalStorage } from "@/common/js/utils";
 import { Dialog, Toast } from 'vant';
 // 全局注册
 Vue.use(Dialog);
