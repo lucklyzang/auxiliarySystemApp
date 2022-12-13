@@ -19,7 +19,9 @@ const AttendanceTypeDetails = () =>
 const PersonnelStatisticsDetails = () =>
     import ('@/pages/auxiliarySystem/PersonnelStatisticsDetails')
 const SubmitSuccessfully = () =>
-    import ('@/pages/auxiliarySystem/SubmitSuccessfully')              
+    import ('@/pages/auxiliarySystem/SubmitSuccessfully')
+const PersonalData = () =>
+    import ('@/pages/auxiliarySystem/PersonalData')                
 const Login = () =>
     import ('@/pages/Login')
 const MyInfo = () =>
@@ -54,6 +56,11 @@ let baseRoute = [{
         path: '/scanQRCode',
         name: 'scanQRCode',
         component: ScanQRCode
+    },
+    {
+        path: '/personalData',
+        name: 'personalData',
+        component: PersonalData
     },
     {
         path: '/attendanceManagement',

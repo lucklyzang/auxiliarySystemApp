@@ -90,12 +90,10 @@
 			</div>
 			<div class="quit-account" @click="isLoginOut">退 出 账 号</div>
 		</div>
-    </div>
-    <FooterBottom></FooterBottom>  
+    </div> 
   </div>
 </template>
 <script>
-import FooterBottom from "@/components/FooterBottom";
 import NavBar from "@/components/NavBar";
 import {} from "@/api/auxiliarySystem.js";
 import {
@@ -106,7 +104,6 @@ import { IsPC, removeAllLocalStorage } from "@/common/js/utils";
 export default {
   name: "MyInfo",
   components: {
-    FooterBottom,
     NavBar,
   },
   data() {
@@ -114,7 +111,7 @@ export default {
       quitDialogShow: false,
       loadingShow: false,
       overlayShow: false,
-      versionNumber: '2.5',
+      versionNumber: '0.1',
       statusBackgroundPng: require("@/common/images/home/status-background.png"),
       accountExpirationTimePng: require("@/common/images/home/account-expiration-time.png"),
       hiredatePng: require("@/common/images/home/hiredate.png"),
