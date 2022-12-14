@@ -54,7 +54,7 @@
         <div class="attendance-type-details-list-box">
           <van-empty description="暂无数据" v-show="emptyShow" />
           <div class="attendance-type-details-list" v-show="!emptyShow" v-for="(item,index) in attendanceTypeDetailsList" :key="index">
-              <div class="attendance-type-details-left">
+              <div class="attendance-type-details-left" @click="photoClickEvent">
                 <img :src="item.sex == 0 ? attendanceTypeWomanPhotoPng : attendanceTypeManPhotoPng" alt="">
               </div>
               <div class="attendance-type-details-right">
@@ -168,6 +168,11 @@ export default {
     ...mapMutations([]),
     onClickLeft() {
       this.$router.push({ path: "/attendanceStatistics"})
+    },
+
+    // 头像点击事件
+    photoClickEvent () {
+      this.$router.push({ path: "/personalData"})
     },
 
     // 回显日期

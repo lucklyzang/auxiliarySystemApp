@@ -42,15 +42,11 @@
         @confirm="dialongSure"
       >
         <div class="task-content">
-          <div class="select-reason-box">
-            <div class="select-content">
-              <van-dropdown-menu 
-                active-color="#1864FF"
-              >
-                <van-dropdown-item v-model="hospitalValue" :options="hospitalOption" />
-              </van-dropdown-menu>
-            </div>
-          </div>
+          <van-dropdown-menu 
+            active-color="#1864FF"
+          >
+            <van-dropdown-item v-model="hospitalValue" :options="hospitalOption" />
+          </van-dropdown-menu>
         </div>
       </van-dialog>
     </div>   
@@ -59,7 +55,7 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
-import {logIn} from '@/api/login.js'
+import {logIn,getHospitalMessage} from '@/api/login.js'
 import { IsPC, setStore,  getStore, removeStore} from "@/common/js/utils";
 import qs from 'qs'
 export default {
@@ -68,7 +64,7 @@ export default {
     return {
       username: "",
       password: "",
-      dialogShow: false,
+      dialogShow: true,
       loadingShow: false,
       overlayShow: false,
       checked: false,
@@ -78,7 +74,11 @@ export default {
         { text: '请选择医院', value: 0 },
         { text: '全部商品', value: 1 },
         { text: '新款商品', value: 2 },
-        { text: '活动商品', value: 3 }
+        { text: '活动商品', value: 3 },
+        { text: '请选择医院', value: 4 },
+        { text: '全部商品', value: 5 },
+        { text: '新款商品', value: 6 },
+        { text: '活动商品', value: 7 }
       ],
 			selectHospitalList: [],
       loginBackgroundPng: require("@/common/images/login/login-background.png"),
@@ -109,7 +109,7 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["storeUserInfo","changeIsLogin","changePermissionInfo","changeRoleNameList","changeOverDueWay"]),
+    ...mapMutations(["storeUserInfo","changeIsLogin","changePermissionInfo","changeRoleNameList","changeOverDueWay","changeHospitalMessage"]),
 
     // 医院选择弹框事件
     dialongSure () {
@@ -152,7 +152,7 @@ export default {
               })
             }
           };
-          this.$router.push({ path: "/home" })
+          this.queryHospitalMessage(this.userInfo.proIds[0])
         } else {
           this.$toast({
             type: 'fail',
@@ -168,7 +168,34 @@ export default {
           message: err
         })
       })
-    }  
+    },
+    
+    // 查询医院信息
+    queryHospitalMessage (ProId) {
+      this.loadingShow = true;
+      this.overlayShow = true;
+      getHospitalMessage(ProId).then((res) => {
+        this.loadingShow = false;
+        this.overlayShow = false;
+        if (res && res.data.code == 200) {
+          this.changeHospitalMessage(res.data.data);
+          this.$router.push({ path: "/home" })
+        } else {
+          this.$toast({
+            type: 'fail',
+            message: res.msg
+          })
+        }
+      })
+      .catch((err) => {
+        this.loadingShow = false;
+        this.overlayShow = false;
+         this.$toast({
+          type: 'fail',
+          message: err
+        })
+      })
+    }
   }
 }
 </script>
@@ -188,40 +215,34 @@ export default {
           background: #f5f5f5;
         };
         .van-dialog__content {
-          min-height: 200px;
+          min-height: 300px;
           overflow: auto;
           .task-content {
             padding: 0 6px 6px 6px;
             box-sizing: border-box;
-            font-size: 14px;
-            display: flex;
-            flex-direction: column;
-            .select-reason-box {
-              .select-content {
-                /deep/ .van-dropdown-menu {
-                  .van-dropdown-menu__bar {
-                    box-shadow: none;
-                    background: none;
-                    height: 35px;
-                    .van-dropdown-menu__item {
-                      justify-content: flex-start;
-                      .van-dropdown-menu__title {
-                        position: relative;
-                        padding: 0 6px;
-                        font-size: 14px;
-                        box-sizing: border-box;
-                        width: 100%;
-                        display: inline-block
-                      };
-                      .van-dropdown-menu__title::after {
-                        right: 10px
-                      }
-                    }
+            /deep/ .van-dropdown-menu {
+              .van-dropdown-menu__bar {
+                box-shadow: none;
+                background: none;
+                height: 35px;
+                .van-dropdown-menu__item {
+                  justify-content: flex-start;
+                  .van-dropdown-menu__title {
+                    position: relative;
+                    padding: 0 6px;
+                    font-size: 14px;
+                    box-sizing: border-box;
+                    width: 100%;
+                    display: inline-block
                   };
-                  .van-dropdown-item {
-                    top: 20vw !important
+                  .van-dropdown-menu__title::after {
+                    right: 10px
                   }
                 }
+              };
+              .van-dropdown-item {
+                z-index: 10000;
+                top: 70px !important
               }
             }
           }

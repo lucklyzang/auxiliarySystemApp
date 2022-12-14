@@ -15,7 +15,7 @@
 						{{ userInfo.name }}
 					</div>
 					<div class="account-name">
-						{{ userInfo.account }}
+						{{ hospitalMessage.hospitalName }} {{ `${hospitalMessage.name}` }}
 					</div>
 				</div>
 			</div>
@@ -77,7 +77,8 @@
         computed: {
             ...mapGetters([
                 'userInfo',
-                'isLogin'
+                'isLogin',
+                'hospitalMessage'
             ])
         },
 

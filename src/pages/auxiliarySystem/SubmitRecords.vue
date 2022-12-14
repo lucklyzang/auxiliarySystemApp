@@ -136,57 +136,57 @@ export default {
     // 任务提交事件
     async submitEvent() {
       this.$router.push({path: '/submitSuccessfully'})
-      // let paramsData = {
-      //   managerId: this.userInfo.id, // 保洁主管id，当前登陆人员id
-      //   managerName: this.userInfo.name,// 保洁主管姓名，当前登陆人员姓名
-      //   assignId: this.userInfo.id, // 任务分配人员id，当前登陆人员id
-      //   assignName: this.userInfo.name,// 任务分配人员姓名，当前登陆人员姓名
-      //   workerId: this.workerValue,//保洁员id
-      //   priority: this.priorityValue, //优先级
-      //   workerName: this.workerOption.filter((item) => { return item.value == this.workerValue})[0]['text'],//保洁员姓名
-      //   path: [], // 上传的问题图片，集合,
-      //   taskType: 0,// 任务类型，即时保洁为 0
-      //   source: this.sourceOption.filter((item) => { return item.value == this.sourceValue })[0]['text'], // 任务来源
-      //   structureId: this.locationMessage[0]['id'], // 建筑id
-      //   structureName: this.locationMessage[0]['structName'], // 建筑名称
-      //   depId: this.locationMessage[1]['id'], // 科室id
-      //   depName: this.locationMessage[1]['departmentName'], // 科室名称
-      //   areaImmediateId: this.locationMessage[2]['id'], // 目的区域id
-      //   areaImmediateName: this.locationMessage[2]['itemName'], // 目的区域名称
-      //   spaces: [],
-      //   standards: [this.violateStandardOption.filter((item) => { return item.value == this.violateStandardValue })[0]['text']], // 检查标准，违反标准，数组
-      //   planFinishTime: this.getNowFormatDate(this.currentDate), // 任务预计完成时间
-      //   planPersons: this.personNumberValue, // 任务预计所需人数
-      //   planUseTime: this.durationValue, // 任务预计用时，单位为分钟
-      //   taskRemark: this.enterRemark, // 任务备注信息
-      //   proId: this.userInfo.proIds[0], // 所属项目id
-      //   proName: this.userInfo.hospitalList[0]['hospitalName'] // 所属项目名称
-      // };
-      // // 上传图片到阿里云服务器
-      // if (this.resultImgList.length > 0) {
-      //   this.loadText ='创建中';
-      //   this.overlayShow = true;
-      //   this.loadingShow = true;
-      //   for (let imgI of this.temporaryFileArray) {
-      //     if (Object.keys(this.timeMessage).length > 0) {
-      //       // 判断签名信息是否过期
-      //       if (new Date().getTime()/1000 - this.timeMessage['expire']  >= -30) {
-      //         await this.getSign();
-      //         await this.uploadImageToOss(imgI)
-      //       } else {
-      //         await this.uploadImageToOss(imgI)
-      //       }
-      //     } else {
-      //       await this.getSign();
-      //       await this.uploadImageToOss(imgI)
-      //     }
-      //   };
-      //   paramsData.path = this.imgOnlinePathArr
-      // };
-      // paramsData.spaces.push({
-      //   id: this.locationMessage[3]['id'],
-      //   name: this.locationMessage[3]['name']
-      // })
+      let paramsData = {
+        managerId: this.userInfo.id, // 保洁主管id，当前登陆人员id
+        managerName: this.userInfo.name,// 保洁主管姓名，当前登陆人员姓名
+        assignId: this.userInfo.id, // 任务分配人员id，当前登陆人员id
+        assignName: this.userInfo.name,// 任务分配人员姓名，当前登陆人员姓名
+        workerId: this.workerValue,//保洁员id
+        priority: this.priorityValue, //优先级
+        workerName: this.workerOption.filter((item) => { return item.value == this.workerValue})[0]['text'],//保洁员姓名
+        path: [], // 上传的问题图片，集合,
+        taskType: 0,// 任务类型，即时保洁为 0
+        source: this.sourceOption.filter((item) => { return item.value == this.sourceValue })[0]['text'], // 任务来源
+        structureId: this.locationMessage[0]['id'], // 建筑id
+        structureName: this.locationMessage[0]['structName'], // 建筑名称
+        depId: this.locationMessage[1]['id'], // 科室id
+        depName: this.locationMessage[1]['departmentName'], // 科室名称
+        areaImmediateId: this.locationMessage[2]['id'], // 目的区域id
+        areaImmediateName: this.locationMessage[2]['itemName'], // 目的区域名称
+        spaces: [],
+        standards: [this.violateStandardOption.filter((item) => { return item.value == this.violateStandardValue })[0]['text']], // 检查标准，违反标准，数组
+        planFinishTime: this.getNowFormatDate(this.currentDate), // 任务预计完成时间
+        planPersons: this.personNumberValue, // 任务预计所需人数
+        planUseTime: this.durationValue, // 任务预计用时，单位为分钟
+        taskRemark: this.enterRemark, // 任务备注信息
+        proId: this.userInfo.proIds[0], // 所属项目id
+        proName: this.userInfo.hospitalList[0]['hospitalName'] // 所属项目名称
+      };
+      // 上传图片到阿里云服务器
+      if (this.resultImgList.length > 0) {
+        this.loadText ='创建中';
+        this.overlayShow = true;
+        this.loadingShow = true;
+        for (let imgI of this.temporaryFileArray) {
+          if (Object.keys(this.timeMessage).length > 0) {
+            // 判断签名信息是否过期
+            if (new Date().getTime()/1000 - this.timeMessage['expire']  >= -30) {
+              await this.getSign();
+              await this.uploadImageToOss(imgI)
+            } else {
+              await this.uploadImageToOss(imgI)
+            }
+          } else {
+            await this.getSign();
+            await this.uploadImageToOss(imgI)
+          }
+        };
+        paramsData.path = this.imgOnlinePathArr
+      };
+      paramsData.spaces.push({
+        id: this.locationMessage[3]['id'],
+        name: this.locationMessage[3]['name']
+      })
     },
 
 
@@ -281,16 +281,20 @@ export default {
 							this.isExpire = false;
 							resolve()
 						} else {
+              this.overlayShow = false;
+              this.loadingShow = false;
 							this.$toast({
-								message: `${res.data.data.msg}`,
+								message: `${res.data.msg}`,
 								type: 'fail'
 							});
 							reject()
 						}
 					})
 					.catch((err) => {
+            this.overlayShow = false;
+            this.loadingShow = false;
             this.$toast({
-              message: `${res.data.data.msg}`,
+              message: `${err}`,
               type: 'fail'
             });
 						reject()
@@ -329,9 +333,15 @@ export default {
             console.log('阿里云图片',this.imgOnlinePathArr);
           })
           .catch((err) => {
+            this.overlayShow = false;
+            this.loadingShow = false;
+            this.$toast({
+              message: `${err}`,
+              type: 'fail'
+            });
             reject()
           })
-          })
+        })
 			},
 
 
