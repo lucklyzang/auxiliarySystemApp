@@ -38,27 +38,27 @@
         <div class="personnel-statistics-box" v-if="statisticalTypeIndex == 0 && statisticsBoxShow">
             <div class="date-box">
                <div class="date-content">
-                    <span>{{ getNowFormatDate(currentPersonDate,'day') }}</span>
+                    <span>{{ getNowFormatDate(currentMonthDate,'day') }}</span>
                     <img :src="calendarPng" alt="" @click="calendarMonthShow = true" />
                </div>
             </div>
-            <van-empty description="暂无数据" v-show="personStatisticalEmptyShow" /> 
-            <div class="personnel-statistics-list-box" v-show="!personStatisticalEmptyShow">
+            <van-empty description="暂无数据" v-show="dayRecordsEmptyShow" /> 
+            <div class="personnel-statistics-list-box" v-show="!dayRecordsEmptyShow">
                 <div class="personnel-statistics-list" v-for="(item,index) in anecdotalRecordsList" :key="index">
                     <div class="personnel-statistics-title">
                         <div class="personnel-statistics-title-left">
-                            {{ item.date }}
+                            {{ item.createTime }}
                         </div>
                         <div class="personnel-statistics-title-right">
-                            <span>{{ item.recordType }}</span>
+                            <span :class="{'spanStyle': item.type == 2}">{{ recordTypeTransition(item.type) }}</span>
                         </div>
                     </div>
                     <div class="personnel-statistics-content">
                       <div class="department-name">
-                        {{ item.departmentName }}
+                        {{ item.depName }}
                       </div>
                       <div class="img-list-box">
-                        <img :src="item" alt="" v-for="(item,index) in item.imgList" :key="index">
+                        <img :src="item" alt="" v-for="(item,index) in item.imgPath" :key="index">
                       </div>
                       <div class="remark-box">
                         <span>备注</span>
@@ -75,23 +75,23 @@
                     <img :src="calendarPng" alt="" @click="calendarPersonShow = true" />
                </div>
             </div>
-            <van-empty description="暂无数据" v-show="personStatisticalEmptyShow" /> 
-            <div class="personnel-statistics-list-box" v-show="!personStatisticalEmptyShow">
+            <van-empty description="暂无数据" v-show="questionRecordsEmptyShow" /> 
+            <div class="personnel-statistics-list-box" v-show="!questionRecordsEmptyShow">
                 <div class="personnel-statistics-list" v-for="(item,index) in problemsRecordsList" :key="index">
                     <div class="personnel-statistics-title">
                         <div class="personnel-statistics-title-left">
-                            {{ item.date }}
+                            {{ item.createTime }}
                         </div>
                         <div class="personnel-statistics-title-right">
-                            <span>{{ item.recordType }}</span>
+                            <span :class="{'spanStyle': item.type == 2}">{{ recordTypeTransition(item.type) }}</span>
                         </div>
                     </div>
                     <div class="personnel-statistics-content">
                       <div class="department-name">
-                        {{ item.departmentName }}
+                        {{ item.depName }}
                       </div>
                       <div class="img-list-box">
-                        <img :src="item" alt="" v-for="(item,index) in item.imgList" :key="index">
+                        <img :src="item" alt="" v-for="(item,index) in item.imgPath" :key="index">
                       </div>
                       <div class="remark-box">
                         <span>备注</span>
@@ -106,7 +106,7 @@
 </template>
 <script>
 import NavBar from "@/components/NavBar";
-import {} from "@/api/auxiliarySystem.js";
+import { getPatrolRecordsList } from "@/api/auxiliarySystem.js";
 import { mapGetters, mapMutations } from "vuex";
 import {mixinsDeviceReturn} from '@/mixins/deviceReturnFunction';
 export default {
@@ -121,8 +121,9 @@ export default {
       attendanceEmptyShow: false,
       expatriateEmptyShow: false,
       overlayShow: false,
-      statisticsBoxShow: true,
-      personStatisticalEmptyShow: false,
+      statisticsBoxShow: false,
+      dayRecordsEmptyShow: false,
+      questionRecordsEmptyShow: false,
       statisticalTypeIndex: 0,
       currentMonthDate: new Date(),
       currentPersonDate: new Date(),
@@ -132,33 +133,15 @@ export default {
       calendarPersonShow: false,
       calendarPng: require("@/common/images/home/calendar.png"),
       statisticalTypeList: ['日常记录','问题记录'],
-      anecdotalRecordsList: [
-        {
-            date: '2022-11-02 16:08',
-            recordType: '日常记录',
-            departmentName: '科室一',
-            remark: '飒飒飒飒飒飒飒飒飒飒飒飒',
-            imgList: [
-                require("@/common/images/home/calendar.png"), require("@/common/images/home/calendar.png")
-            ]
-        }
-      ],
-      problemsRecordsList: [
-           {
-            date: '2022-11-02 16:08',
-            recordType: '日常记录',
-            remark: '飒飒飒飒飒飒飒飒飒飒飒飒',
-            imgList: [
-                require("@/common/images/home/calendar.png"), require("@/common/images/home/calendar.png")
-            ]
-        }
-      ]
+      anecdotalRecordsList: [],
+      problemsRecordsList: []
     }
   },
 
   mounted() {
     // 控制设备物理返回按键
-    this.deviceReturn("/scanQRCode")
+    this.deviceReturn("/scanQRCode");
+    this.queryPatrolRecordsList(1)
   },
 
   watch: {},
@@ -170,68 +153,28 @@ export default {
   methods: {
     ...mapMutations([]),
 
-    // vant tab切换事件
-    vanTabsChangeEvent () {
-        if (this.attendanceSituationList.length == 0) {
-            this.attendanceEmptyShow = true
-        } else {
-            this.attendanceEmptyShow = false
-        };
-        if (this.expatriateList.length == 0) {
-            this.expatriateEmptyShow = true
-        }  else {
-            this.expatriateEmptyShow = false
-        }
-    },
-
-    // 统计类型点击事件
+    // 巡查记录类型点击事件
     statisticalTypeEvent (item,index) {
         this.statisticalTypeIndex = index;
         if (index == 0) {
-            this.getDailyRecordData()
+            this.queryPatrolRecordsList(1)
         } else if (index == 1) {
-            this.getProblemRecordData()
+            this.queryPatrolRecordsList(2)
         }
     },
 
-    // 考勤类型转换
-    attendanceTypeTransition (num) {
+    // 记录类型转换
+    recordTypeTransition (num) {
         switch(num) {
-            case 0 :
-                return '未出勤'
-                break;
             case 1 :
-                return '出勤'
+                return '日常记录'
                 break;
             case 2 :
-                return '外派'
-                break;
-            case 3 :
-                return '工伤'
-                break;
-            case 4 :
-                return '病假'
-                break;
-            case 5 :
-                return '调班'
-                break;
-            case 6 :
-                return '休假'
-                break;
-            case 7 :
-                return '加班'
-                break;
-            case 8 :
-                return '迟到早退'
-                break;
-            case 9 :
-                return '旷工'
-                break;
-            case 10 :
-                return '事假'
-                break;
+                return '问题记录'
+                break
         }
     },
+
 
     // 格式化时间
     getNowFormatDate(currentDate,type) {
@@ -260,20 +203,58 @@ export default {
 
     onConMonthFirm() {
         this.calendarMonthShow = false;
-        this.getDailyRecordData();
+        this.queryPatrolRecordsList(1)
     },
 
     onConPersonFirm() {
         this.calendarPersonShow = false;
-        this.getProblemRecordData()
+        this.queryPatrolRecordsList(2)
     },
 
-    // 获取日常记录数据
-    getDailyRecordData () {
-    },
-
-    // 获取问题记录数据
-    getProblemRecordData () {
+    // 获取巡查记录列表
+    queryPatrolRecordsList (value) {
+        console.log(value);
+        this.loadingShow = true;
+        this.overlayShow = true;
+        this.statisticsBoxShow = false;
+        if (value == 0) {
+            this.dayRecordsEmptyShow = false
+        } else {
+            this.questionRecordsEmptyShow = false
+        };
+        let temporaryDate = value == 1 ? this.getNowFormatDate(this.currentMonthDate,'day') : this.getNowFormatDate(this.currentPersonDate,'day');
+		getPatrolRecordsList({startDate: temporaryDate, endDate: '', type: value , system: 5})
+        .then((res) => {
+            this.loadingShow = false;
+            this.overlayShow = false;
+            this.statisticsBoxShow = true;
+        if (res && res.data.code == 200) {
+            if (value == 1) {
+                this.anecdotalRecordsList = res.data.data.filter((item) => { return item.type == value });
+                if (this.anecdotalRecordsList.length == 0) {
+                    this.dayRecordsEmptyShow = true
+                }
+            } else if (value == 2) {
+                this.problemsRecordsList = res.data.data.filter((item) => { return item.type == value});
+                if (this.problemsRecordsList.length == 0) {
+                    this.questionRecordsEmptyShow = true
+                }
+            }
+        } else {
+          this.$toast({
+            type: 'fail',
+            message: res.data.msg
+          })
+        }
+      })
+      .catch((err) => {
+        this.loadingShow = false;
+        this.overlayShow = false;
+        this.$toast({
+          type: 'fail',
+          message: err
+        })
+      })
     }
   }
 };
@@ -419,6 +400,9 @@ export default {
                             width: 21px;
                             height: 21px;
                             vertical-align: middle
+                        };
+                        .spanStyle {
+                           color: #E86F50 !important; 
                         }
                     }
                 };

@@ -35,7 +35,7 @@
       </div>
       <div class="form-btn" @click="loginEvent">登 录</div>
     </div>
-    <!-- 完成任务弹框 -->
+    <!-- 选择医院弹框 -->
     <div class="hospital-select-box">
       <van-dialog v-model="dialogShow"
         title="选择医院"
@@ -64,7 +64,7 @@ export default {
     return {
       username: "",
       password: "",
-      dialogShow: true,
+      dialogShow: false,
       loadingShow: false,
       overlayShow: false,
       checked: false,

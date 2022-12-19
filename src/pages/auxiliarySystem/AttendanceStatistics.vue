@@ -106,18 +106,6 @@
                             </div>
                         </div>
                     </van-tab>
-                    <van-tab title="外派" name="expatriate">
-                        <van-empty description="暂无数据" v-show="expatriateEmptyShow" />
-                        <div class="attendance-situation-list" v-for="(item,index) in expatriateList" :key="index">
-                            <div class="attendance-situation-left">
-                                {{ item.workerName}}
-                            </div>
-                            <div class="attendance-situation-right">
-                                <span>外派:</span>
-                                <span>{{ `${item.morning == 1 ? '上午' : ''}、${item.afternoon == 1 ? '下午' : ''}` }}</span>
-                            </div>
-                        </div>
-                    </van-tab>
                 </van-tabs>
             </div>
         </div>
@@ -282,52 +270,52 @@ export default {
         {
             attendanceTypeName: '出勤',
             attendanceType: '出勤(人天)',
-            totalNum: 4.5
+            totalNum: ''
         },
         {
             attendanceTypeName: '外派',
             attendanceType: '外派(人天)',
-            totalNum: 4.5
+            totalNum: ''
         },
         {
             attendanceTypeName: '工伤',
             attendanceType: '工伤(人天)',
-            totalNum: 4.5
+            totalNum: ''
         },
         {
             attendanceTypeName: '病假',
             attendanceType: '病假(人天)',
-            totalNum: 4.5
+            totalNum: ''
         },
         {   
             attendanceTypeName: '休假',
             attendanceType: '休假(人天)',
-            totalNum: 4.5
+            totalNum: ''
         },
         {
             attendanceTypeName: '加班',
             attendanceType: '加班(人天、共计时长)',
-            totalNum: 4.5
+            totalNum: ''
         },
         {
             attendanceTypeName: '迟到早退',
             attendanceType: '迟到早退(人天)',
-            totalNum: 4.5
+            totalNum: ''
         },
         {
             attendanceTypeName: '事假',
             attendanceType: '事假(人天)',
-            totalNum: 4.5
+            totalNum: ''
         },
         {
             attendanceTypeName: '调班',
             attendanceType: '调班(人天)',
-            totalNum: 4.5
+            totalNum: ''
         },
         {
             attendanceTypeName: '旷工',
             attendanceType: '旷工(人天)',
-            totalNum: 4.5
+            totalNum: ''
         }
       ],
       personnelStatisticsList: []
@@ -389,11 +377,6 @@ export default {
             this.attendanceEmptyShow = true
         } else {
             this.attendanceEmptyShow = false
-        };
-        if (this.expatriateList.length == 0) {
-            this.expatriateEmptyShow = true
-        }  else {
-            this.expatriateEmptyShow = false
         }
     },
 
@@ -535,7 +518,8 @@ export default {
       this.loadingShow = true;
       this.overlayShow = true;
       this.statisticsBoxShow = false;
-      cleanAttendanceDay({proId: this.userInfo.proIds[0],date: this.getNowFormatDate(this.currentDayDate,'day')}).then((res) => {
+      cleanAttendanceDay({proId: this.userInfo.proIds[0],date: this.getNowFormatDate(this.currentDayDate,'day'),system:5}).then((res) => {
+        console.log('阿萨飒飒',res.data);
         this.loadingShow = false;
         this.overlayShow = false;
         this.statisticsBoxShow = true;
@@ -566,16 +550,10 @@ export default {
                 }
             };
             this.attendanceSituationList = res.data.data.chuQinList;
-            this.expatriateList = res.data.data.waiPaiList;
             if (this.attendanceSituationList.length == 0) {
                 this.attendanceEmptyShow = true
             } else {
                 this.attendanceEmptyShow = false
-            };
-            if (this.expatriateList.length == 0) {
-                this.expatriateEmptyShow = true
-            }  else {
-                this.expatriateEmptyShow = false
             }
         } else {
             this.$toast({
@@ -600,10 +578,11 @@ export default {
       this.loadingShow = true;
       this.overlayShow = true;
       this.statisticsBoxShow = false;
-      cleanAttendanceMonth({proId: this.userInfo.proIds[0],month: this.getNowFormatDate(this.currentMonthDate,'month')}).then((res) => {
+      cleanAttendanceMonth({proId: this.userInfo.proIds[0],month: this.getNowFormatDate(this.currentMonthDate,'month'),system:5}).then((res) => {
         this.loadingShow = false;
         this.overlayShow = false;
         this.statisticsBoxShow = true;
+        console.log('阿萨飒飒',res.data);
 		if (res && res.data.code == 200) {
             for (let item of this.attendanceTypeList) {
                 if (item.attendanceTypeName == '出勤') {
@@ -654,10 +633,11 @@ export default {
       this.personStatisticalEmptyShow = false;
       this.statisticsBoxShow = false;
       this.personnelStatisticsList = [];
-      cleanAttendancePeople({proId: this.userInfo.proIds[0],month: this.getNowFormatDate(this.currentPersonDate,'person')}).then((res) => {
+      cleanAttendancePeople({proId: this.userInfo.proIds[0],month: this.getNowFormatDate(this.currentPersonDate,'person'),system:5}).then((res) => {
         this.loadingShow = false;
         this.overlayShow = false;
         this.statisticsBoxShow = true;
+        console.log('阿萨飒飒',res.data);
 		if (res && res.data.code == 200) {
            if (res.data.data.length > 0) {
                 this.personnelStatisticsList = res.data.data

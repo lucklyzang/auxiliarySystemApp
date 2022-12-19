@@ -27,7 +27,7 @@ export function getHospitalMessage(proId) {
 // 获取阿里云签名接口
 export function getAliyunSign() {
 	return request({
-	    url: 'clean/oss/getSign',
+	    url: 'nblink/attend/oss/getSign',
 	    method: 'get'
 	})
 }

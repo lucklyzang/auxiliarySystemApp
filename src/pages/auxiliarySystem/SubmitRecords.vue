@@ -91,10 +91,10 @@
 </template>
 <script>
 import NavBar from "@/components/NavBar";
-import {addForthwithCleanTask} from "@/api/auxiliarySystem.js";
+import {addPatrolRecords} from "@/api/auxiliarySystem.js";
 import { mapGetters, mapMutations } from "vuex";
 import {mixinsDeviceReturn} from '@/mixins/deviceReturnFunction';
-import { compress } from "@/common/js/utils";
+import { compress,base64ImgtoFile } from "@/common/js/utils";
 import {getAliyunSign} from '@/api/login.js'
 import axios from 'axios'
 export default {
@@ -114,8 +114,7 @@ export default {
       loadText: '创建中',
       enterRemark: "",
       resultImgList: [],
-      imgOnlinePathArr: [],
-      temporaryFileArray: []
+      imgOnlinePathArr: []
     }
   },
 
@@ -135,39 +134,12 @@ export default {
 
     // 任务提交事件
     async submitEvent() {
-      this.$router.push({path: '/submitSuccessfully'})
-      let paramsData = {
-        managerId: this.userInfo.id, // 保洁主管id，当前登陆人员id
-        managerName: this.userInfo.name,// 保洁主管姓名，当前登陆人员姓名
-        assignId: this.userInfo.id, // 任务分配人员id，当前登陆人员id
-        assignName: this.userInfo.name,// 任务分配人员姓名，当前登陆人员姓名
-        workerId: this.workerValue,//保洁员id
-        priority: this.priorityValue, //优先级
-        workerName: this.workerOption.filter((item) => { return item.value == this.workerValue})[0]['text'],//保洁员姓名
-        path: [], // 上传的问题图片，集合,
-        taskType: 0,// 任务类型，即时保洁为 0
-        source: this.sourceOption.filter((item) => { return item.value == this.sourceValue })[0]['text'], // 任务来源
-        structureId: this.locationMessage[0]['id'], // 建筑id
-        structureName: this.locationMessage[0]['structName'], // 建筑名称
-        depId: this.locationMessage[1]['id'], // 科室id
-        depName: this.locationMessage[1]['departmentName'], // 科室名称
-        areaImmediateId: this.locationMessage[2]['id'], // 目的区域id
-        areaImmediateName: this.locationMessage[2]['itemName'], // 目的区域名称
-        spaces: [],
-        standards: [this.violateStandardOption.filter((item) => { return item.value == this.violateStandardValue })[0]['text']], // 检查标准，违反标准，数组
-        planFinishTime: this.getNowFormatDate(this.currentDate), // 任务预计完成时间
-        planPersons: this.personNumberValue, // 任务预计所需人数
-        planUseTime: this.durationValue, // 任务预计用时，单位为分钟
-        taskRemark: this.enterRemark, // 任务备注信息
-        proId: this.userInfo.proIds[0], // 所属项目id
-        proName: this.userInfo.hospitalList[0]['hospitalName'] // 所属项目名称
-      };
       // 上传图片到阿里云服务器
       if (this.resultImgList.length > 0) {
-        this.loadText ='创建中';
+        this.loadText ='提交中';
         this.overlayShow = true;
         this.loadingShow = true;
-        for (let imgI of this.temporaryFileArray) {
+        for (let imgI of this.resultImgList) {
           if (Object.keys(this.timeMessage).length > 0) {
             // 判断签名信息是否过期
             if (new Date().getTime()/1000 - this.timeMessage['expire']  >= -30) {
@@ -181,12 +153,40 @@ export default {
             await this.uploadImageToOss(imgI)
           }
         };
-        paramsData.path = this.imgOnlinePathArr
-      };
-      paramsData.spaces.push({
-        id: this.locationMessage[3]['id'],
-        name: this.locationMessage[3]['name']
-      })
+        // 添加巡查记录
+        addPatrolRecords({
+          workerId: this.userInfo.id, //当前登陆员工id
+          workerName: this.userInfo.name, //当前登陆员工姓名
+          depId: '12', // 当前科室id
+          type: this.radioValue,   // 类别 1-日常记录，2-问题记录'
+          remark: this.enterRemark,  // 备注
+          system: 5,   // 系统类型  固定传 5
+          depName: "敬佩是", // 当前科室名称
+          createName: this.userInfo.name, //当前登陆员工姓名
+          imgPath: this.imgOnlinePathArr, //仅回显已上传到阿里云的图片地址
+          modifyName: this.userInfo.name // 修改者 非必输
+        })
+        .then((res) => {
+          this.overlayShow = false;
+          this.loadingShow = false;
+          if (res && res.data.code == 200) {
+            this.$router.push({path: '/submitSuccessfully'})
+          } else {
+            this.$toast({
+              message: `${res.data.msg}`,
+              type: 'fail'
+            })
+          }
+        })
+        .catch((err) => {
+          this.overlayShow = false;
+          this.loadingShow = false;
+          this.$toast({
+            message: `${err}`,
+            type: 'fail'
+          })
+        })
+      }
     },
 
 
@@ -215,7 +215,6 @@ export default {
           img.onload = function () {
             let src = compress(img);
             _this.resultImgList.push(src);
-            _this.temporaryFileArray.push(file);
             _this.photoBox = false;
             _this.overlayShow = false
           };
@@ -252,7 +251,6 @@ export default {
           img.onload = function () {
             let src = compress(img);
             _this.resultImgList.push(src);
-            _this.temporaryFileArray.push(file);
             _this.photoBox = false;
             _this.overlayShow = false
           };
@@ -308,9 +306,9 @@ export default {
           // OSS地址
           const aliyunServerURL = this.ossMessage.host;
           // 存储路径(后台固定位置+随即数+文件格式)
-          const aliyunFileKey = this.ossMessage.dir + new Date().getTime() + Math.floor(Math.random() * 100) + filePath.name;
+          const aliyunFileKey = this.ossMessage.dir + new Date().getTime() + Math.floor(Math.random() * 100) + base64ImgtoFile(filePath).name;
           // 临时AccessKeyID0
-          const OSSAccessKeyId = this.ossMessage.accessId;
+          const OSSAccessKeyId = this.ossMessage.accessid;
           // 加密策略
           const policy = this.ossMessage.policy;
           // 签名
@@ -321,7 +319,7 @@ export default {
           formData.append('OSSAccessKeyId',OSSAccessKeyId);
           formData.append('success_action_status','200');
           formData.append('Signature',signature);
-          formData.append('file',filePath);
+          formData.append('file',base64ImgtoFile(filePath));
           axios({
             url: aliyunServerURL,
             method: 'post',
@@ -360,8 +358,7 @@ export default {
 
     // 确定删除提示框确定事件
     sureDeleteEvent () {
-      this.resultImgList.splice(this.imgIndex, 1);
-      this.temporaryFileArray.splice(this.imgIndex, 1)
+      this.resultImgList.splice(this.imgIndex, 1)
     },
 
     // 拍照取消

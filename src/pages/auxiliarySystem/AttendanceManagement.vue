@@ -455,7 +455,7 @@ export default {
     getWorkerList () {
         this.substitutePersonMorningValueOption = [{ text: '请选择', value: 0 }];
         this.substitutePersonAfternoonValueOption = [{ text: '请选择', value: 0 }];
-        cleanbxWorkerList(this.userInfo.proIds[0]).then((res) => {
+        cleanbxWorkerList({proId:this.userInfo.proIds[0],permissions:'adj:oper:repair'}).then((res) => {
             if (res && res.data.code == 200) {
                 if (res.data.data.length > 0) {
                     for (let item of res.data.data) {
@@ -563,7 +563,7 @@ export default {
       this.overlayShow = true;
       this.emptyShow = false;
       this.loadingText = '加载中···';
-      cleanAttendanceList({proId: this.userInfo.proIds[0],date: this.getNowFormatDate(this.currentDayDate,'day'),name: searchText}).then((res) => {
+      cleanAttendanceList({proId: this.userInfo.proIds[0],date: this.getNowFormatDate(this.currentDayDate,'day'),name: searchText,system: 5}).then((res) => {
         this.loadingShow = false;
         this.overlayShow = false;
 		if (res && res.data.code == 200) {

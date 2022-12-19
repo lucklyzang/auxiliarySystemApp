@@ -3,10 +3,10 @@
     <van-loading size="35px" vertical color="#e6e6e6" v-show="loadingShow">加载中...</van-loading>
     <van-overlay :show="overlayShow" z-index="100000" />
     <div class="nav">
-      <NavBar path="/scanQRCode" title="个人资料" />
+      <NavBar :path="personInfo['pageSource']" title="个人资料" />
     </div>
     <div class="content">
-       <div class="basic-message">
+       <div class="basic-message" v-if="loadingSuccess">
            <div class="top">基本信息</div>
            <div class="bottom">
                 <div class="content-top-content">
@@ -16,54 +16,54 @@
                     <div class="user-message">
                         <div class="user-name">
                             <span>岗位:</span>
-                            <span>{{ userInfo.name }}</span>
+                            <span>{{ personMessage['postManage']['name'] }}</span>
                         </div>
                         <div class="user-name">
                             <span>姓名:</span>
-                            <span></span>{{ userInfo.account }}
+                            <span></span>{{ personMessage['name'] }}
                         </div>
                         <div class="user-name">
                             <span>所属部门:</span>
-                            <span></span>{{ userInfo.account }}
+                            <span></span>{{ personMessage['deps'] }}
                         </div>
                         <div class="user-name">
                             <span>办公电话:</span>
-                            <span></span>{{ userInfo.account }}
+                            <span></span>{{ personMessage['workPhone'] }}
                         </div>
                     </div>
                 </div>
            </div>
        </div>
-       <div class="specific-message">
+       <div class="specific-message" v-if="loadingSuccess">
            <div class="top">岗位信息</div>
            <div class="time-box">
                <div class="work-time">
                    <span>上班时间:</span>
-                   <span>6:00</span>
+                   <span>{{ personMessage['postManage']['comeTime'] }}</span>
                </div>
                <div class="offer-work-time">
                    <span>下班时间:</span>
-                   <span>18:00</span>
+                   <span>{{ personMessage['postManage']['goTime'] }}</span>
                </div>
            </div>
            <div class="job-description">
                <span>岗位描述:</span>
-               <span>啥就看啥沙卡就是</span>
+               <span>{{ personMessage['postManage']['remark'] }}</span>
            </div>
            <div class="job-placement">
                <div>
                    日工作安排: 
                </div>
-               <div>
-                   杀杀来杀沙拉和莎拉杀手
+               <div v-for="(item,index) in personMessage['postManage']['dayPlanEntities']" :key="index">
+                   {{ `${item.startTime} - ${item.finishTime}` }} {{ item.remark }}
                </div>
             </div>
             <div class="job-placement week-job-placement">
                <div>
                    周工作安排: 
                </div>
-               <div>
-                   杀杀来杀沙拉和莎拉杀手
+               <div v-for="(item,index) in personMessage['postManage']['weekPlanEntities']" :key="index">
+                   {{ item.week }}: {{ item.remark }}
                </div>
             </div>    
        </div>
@@ -72,7 +72,7 @@
 </template>
 <script>
 import NavBar from "@/components/NavBar";
-import {} from "@/api/auxiliarySystem.js";
+import { getPersonInfo } from "@/api/auxiliarySystem.js";
 import { mapGetters, mapMutations } from "vuex";
 import {mixinsDeviceReturn} from '@/mixins/deviceReturnFunction';
 export default {
@@ -85,23 +85,50 @@ export default {
     return {
       loadingShow: false,
       overlayShow: false,
+      loadingSuccess: false,
+      personMessage: {},
       defaultPersonPng: require("@/common/images/home/default-person.png")
     }
   },
 
   mounted() {
     // 控制设备物理返回按键
-    this.deviceReturn("/scanQRCode")
+    this.deviceReturn(this.personInfo['pageSource']);
+    this.queryPersonMessage()
   },
 
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo"])
+    ...mapGetters(["userInfo","personInfo"])
   },
 
   methods: {
-    ...mapMutations([])
+    ...mapMutations([]),
+
+    queryPersonMessage () {
+        getPersonInfo({workerId: this.personInfo['workerId'], postId: this.personInfo['postId'] }).then((res) => {
+            this.loadingShow = false;
+            this.overlayShow = false;
+        if (res && res.data.code == 200) {
+            this.loadingSuccess = true;
+            this.personMessage = res.data.data
+        } else {
+          this.$toast({
+            type: 'fail',
+            message: res.data.msg
+          })
+        }
+      })
+      .catch((err) => {
+        this.loadingShow = false;
+        this.overlayShow = false;
+        this.$toast({
+          type: 'fail',
+          message: err
+        })
+      })
+    }
   }
 };
 </script>
@@ -240,11 +267,9 @@ export default {
             margin-bottom: 20px;
             color: #101010;
             >div {
+                margin-top: 10px;
                 &:first-child {
                     font-weight: bold
-                };
-                &:last-child {
-                    margin-top: 10px
                 }
             } 
         }

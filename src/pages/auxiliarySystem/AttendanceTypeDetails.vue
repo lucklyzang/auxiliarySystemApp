@@ -54,7 +54,7 @@
         <div class="attendance-type-details-list-box">
           <van-empty description="暂无数据" v-show="emptyShow" />
           <div class="attendance-type-details-list" v-show="!emptyShow" v-for="(item,index) in attendanceTypeDetailsList" :key="index">
-              <div class="attendance-type-details-left" @click="photoClickEvent">
+              <div class="attendance-type-details-left" @click="photoClickEvent(item)">
                 <img :src="item.sex == 0 ? attendanceTypeWomanPhotoPng : attendanceTypeManPhotoPng" alt="">
               </div>
               <div class="attendance-type-details-right">
@@ -161,17 +161,22 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["userInfo","attendanceTypeDetailsMessage"])
+    ...mapGetters(["userInfo","attendanceTypeDetailsMessage","personInfo"])
   },
 
   methods: {
-    ...mapMutations([]),
+    ...mapMutations(['storePersonInfo']),
     onClickLeft() {
       this.$router.push({ path: "/attendanceStatistics"})
     },
 
     // 头像点击事件
-    photoClickEvent () {
+    photoClickEvent (item) {
+      let temporaryPersonInfo = this.personInfo;
+      temporaryPersonInfo['postId'] = item.postId;
+      temporaryPersonInfo['workerId'] = item.workerId;
+      temporaryPersonInfo['pageSource'] = '/attendanceTypeDetails';
+      this.storePersonInfo(temporaryPersonInfo);
       this.$router.push({ path: "/personalData"})
     },
 
@@ -308,7 +313,7 @@ export default {
       this.overlayShow = true;
       this.statisticsBoxShow = false;
       this.emptyShow = false;
-      cleanAttendanceDayInfo({proId: this.userInfo.proIds[0],date: this.getNowFormatDate(this.currentDayDate,'day'), type: this.attendanceTypeTransition(this.attendanceTypeDetailsMessage.content.name)}).then((res) => {
+      cleanAttendanceDayInfo({proId: this.userInfo.proIds[0],date: this.getNowFormatDate(this.currentDayDate,'day',), type: this.attendanceTypeTransition(this.attendanceTypeDetailsMessage.content.name),system:5}).then((res) => {
         this.loadingShow = false;
         this.overlayShow = false;
         this.statisticsBoxShow = true;
@@ -342,7 +347,7 @@ export default {
       this.overlayShow = true;
       this.statisticsBoxShow = false;
       this.emptyShow = false;
-      cleanAttendanceMonthInfo({proId: this.userInfo.proIds[0],month: this.getNowFormatDate(this.currentMonthDate,'month'),type:this.attendanceTypeTransition(this.attendanceTypeDetailsMessage.content.attendanceTypeName)}).then((res) => {
+      cleanAttendanceMonthInfo({proId: this.userInfo.proIds[0],month: this.getNowFormatDate(this.currentMonthDate,'month'),type:this.attendanceTypeTransition(this.attendanceTypeDetailsMessage.content.attendanceTypeName),system:5}).then((res) => {
         this.loadingShow = false;
         this.overlayShow = false;
         this.statisticsBoxShow = true;
@@ -376,7 +381,7 @@ export default {
       this.overlayShow = true;
       this.statisticsBoxShow = false;
       this.emptyShow = false;
-      cleanAttendanceMonthAttendance({proId: this.userInfo.proIds[0],month: this.getNowFormatDate(this.currentMonthDate,'month')}).then((res) => {
+      cleanAttendanceMonthAttendance({proId: this.userInfo.proIds[0],month: this.getNowFormatDate(this.currentMonthDate,'month'),system:5}).then((res) => {
         this.loadingShow = false;
         this.overlayShow = false;
         this.statisticsBoxShow = true;

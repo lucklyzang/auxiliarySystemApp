@@ -426,7 +426,7 @@ export default {
       this.loadingShow = true;
       this.overlayShow = true;
       this.statisticsBoxShow = false;
-      cleanAttendancePeopleInfo({proId: this.userInfo.proIds[0],workerId: this.personnelStatisticsDetailsMessage.content.id, month: this.getNowFormatDate(this.currentPersonDate, 'person')}).then((res) => {
+      cleanAttendancePeopleInfo({proId: this.userInfo.proIds[0],workerId: this.personnelStatisticsDetailsMessage.content.id, month: this.getNowFormatDate(this.currentPersonDate, 'person'),system:5}).then((res) => {
         this.loadingShow = false;
         this.overlayShow = false;
         this.statisticsBoxShow = true;

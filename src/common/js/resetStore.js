@@ -13,10 +13,11 @@ export function getDefaultLoginState() {
         hospitalMessage: {} //医院信息
     }
 };
-// 环境管理信息store的初始值
+// 陪护管理信息store的初始值
 export function getDefaultAuxiliaryModuleState() {
     return {
        attendanceTypeDetailsMessage: {},
+       personInfo: {},
        personnelStatisticsDetailsMessage: {},
        locationMessage: [],
        attendanceStatisticsSwitchMessage: {}

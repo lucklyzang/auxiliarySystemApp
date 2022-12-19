@@ -13,6 +13,10 @@ export default {
             return state.locationMessage
         },
 
+        personInfo : (state) => {
+            return state.personInfo
+        },
+
         attendanceTypeDetailsMessage : (state) => {
             state.attendanceTypeDetailsMessage = getStore('attendanceTypeDetailsMessage') ? JSON.parse(getStore('attendanceTypeDetailsMessage')) : {};
             return state.attendanceTypeDetailsMessage
@@ -53,6 +57,13 @@ export default {
         storeLocationMessage(state, playLoad) {
             if (playLoad && playLoad != 'null') {
                 state.locationMessage = playLoad
+            }
+        },
+
+        // 保存人员信息
+        storePersonInfo(state, playLoad) {
+            if (playLoad && playLoad != 'null') {
+                state.personInfo = playLoad
             }
         },
 
