@@ -377,12 +377,15 @@ export default {
     forenoonAttendanceRadioValue: {
         handler: function(newVal, oldVal) {
             if (newVal == 5) {
+                // 调班
+                this.substitutePersonMorningValue = 0;
                 this.isShowForenoonChangeShiftBox = true
             } else {
                 this.isShowForenoonChangeShiftBox = false
             };
             if (newVal == 4 || newVal == 6 || newVal == 10 || newVal == 7 || newVal == 9) {
-                this.isShowForenoonDurationBox = true
+                this.isShowForenoonDurationBox = true; 
+                this.currentMorningDuration = ''
             } else {
                 this.isShowForenoonDurationBox = false
             }
@@ -394,12 +397,15 @@ export default {
     afternoonAttendanceRadioValue: {
         handler: function(newVal, oldVal) {
            if (newVal == 5) {
+            // 调班
+            this.substitutePersonAfternoonValue = 0;
             this.isShowAfternoonChangeShiftBox = true
             } else {
                 this.isShowAfternoonChangeShiftBox = false
             };
             if (newVal == 4 || newVal == 6 || newVal == 10 || newVal == 7 || newVal == 9) {
-                this.isShowAfternoonDurationBox = true
+                this.isShowAfternoonDurationBox = true;
+                this.currentAfternoonDuration = ''
             } else {
                 this.isShowAfternoonDurationBox = false
             }
