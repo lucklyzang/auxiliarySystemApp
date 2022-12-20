@@ -164,7 +164,7 @@
                     <van-icon name="arrow" size="25" color="#1864FF" />
                 </div>
                <div class="list-content">
-                    <div class="person-name">{{ `${index + 1}、${item.workerName}`}}</div>
+                    <div class="person-name">{{ `${index + 1}、${item.postName}-${item.workerName}`}}</div>
                     <div class="attendance-status">
                         <div class="attendance-status-left">
                             <div class="forenoon-status">

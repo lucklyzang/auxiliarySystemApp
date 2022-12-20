@@ -59,16 +59,16 @@
               </div>
               <div class="attendance-type-details-right">
                   <div class="person-name" v-show="attendanceTypeDetailsMessage.type == 'month' && attendanceTypeDetailsMessage.content.attendanceTypeName == '出勤'">
-                    {{ `${item.name} (${item.total})` }}
+                    {{ `${item.postName}-${item.name} (${item.total})` }}
                   </div>
                   <div class="person-name" v-show="attendanceTypeDetailsMessage.type == 'month' && attendanceTypeDetailsMessage.content.attendanceTypeName != '出勤'">
-                    {{ item.workerName }}
+                    {{ `${item.postName}-${item.workerName}` }}
                   </div>
                   <!-- <div class="person-name" v-show="attendanceTypeDetailsMessage.type == 'day' && attendanceTypeDetailsMessage.content.name != '出勤'">
                     {{ item.workerName }}
                   </div> -->
                   <div class="person-name" v-show="attendanceTypeDetailsMessage.type == 'day'">
-                    {{ item.name }}
+                    {{ `${item.postName}-${item.name}` }}
                   </div>
                   <div class="day-message" v-show="attendanceTypeDetailsMessage.type == 'day' ">
                     <div class="day-message-left">
@@ -175,6 +175,7 @@ export default {
       let temporaryPersonInfo = this.personInfo;
       temporaryPersonInfo['postId'] = item.postId;
       temporaryPersonInfo['workerId'] = item.workerId;
+      temporaryPersonInfo['postName'] = item.postName;
       temporaryPersonInfo['pageSource'] = '/attendanceTypeDetails';
       this.storePersonInfo(temporaryPersonInfo);
       this.$router.push({ path: "/personalData"})

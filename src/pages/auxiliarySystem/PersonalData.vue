@@ -11,12 +11,12 @@
            <div class="bottom">
                 <div class="content-top-content">
                     <div class="user-photo">
-                        <img :src="defaultPersonPng" />
+                        <img :src="attendanceTypeManPhotoPng" />
                     </div>
                     <div class="user-message">
                         <div class="user-name">
                             <span>岗位:</span>
-                            <span>{{ personMessage['postManage']['name'] }}</span>
+                            <span>{{ `${personMessage['postManage']['name']}${personMessage['postManage']['number']}` }}</span>
                         </div>
                         <div class="user-name">
                             <span>姓名:</span>
@@ -63,7 +63,7 @@
                    周工作安排: 
                </div>
                <div v-for="(item,index) in personMessage['postManage']['weekPlanEntities']" :key="index">
-                   {{ item.week }}: {{ item.remark }}
+                   {{ weekTypeTransitionText(item.week) }}: {{ item.remark }}
                </div>
             </div>    
        </div>
@@ -87,7 +87,7 @@ export default {
       overlayShow: false,
       loadingSuccess: false,
       personMessage: {},
-      defaultPersonPng: require("@/common/images/home/default-person.png")
+      attendanceTypeManPhotoPng: require("@/common/images/home/attendance-type-man-photo.png")
     }
   },
 
@@ -105,6 +105,33 @@ export default {
 
   methods: {
     ...mapMutations([]),
+
+    // 周几类型转换
+    weekTypeTransitionText (num) {
+      switch(num) {
+        case 1 :
+          return '星期一'
+          break;
+        case 2 :
+          return '星期二'
+          break;
+        case 3 :
+          return '星期三'
+          break;
+        case 4 :
+          return '星期四'
+          break;
+        case 5 :
+          return '星期五'
+          break;
+        case 6 :
+          return '星期六'
+          break;
+        case 7 :
+          return '星期日'
+          break;
+      }
+    },
 
     queryPersonMessage () {
         getPersonInfo({workerId: this.personInfo['workerId'], postId: this.personInfo['postId'] }).then((res) => {
@@ -196,7 +223,7 @@ export default {
                     justify-content: center;
                     align-items: center;
                     width: 85px;
-                    margin: 0 20px;
+                    margin-right: 20px;
                     height: 85px;
                     border-radius: 50%;
                     img {

@@ -734,7 +734,8 @@ export default {
             align-items: center;
             .attendance-condition-left {
                 font-size: 14px;
-                color: #101010
+                color: #101010;
+                width: 65px
             };
             .attendance-condition-right {
                 flex: 1;
@@ -744,6 +745,8 @@ export default {
                     padding-right: 16px;
                     box-sizing: border-box;
                     border-right: 1px solid #101010;
+                    text-align: center;
+                    line-height: 20px;
                     >span {
                         font-size: 14px;
                         &:nth-child(1) {
@@ -788,6 +791,8 @@ export default {
                 .afternoon-attendance {
                     padding-left: 16px;
                     box-sizing: border-box;
+                    text-align: center;
+                    line-height: 20px;
                     >span {
                         font-size: 14px;
                         &:nth-child(1) {
