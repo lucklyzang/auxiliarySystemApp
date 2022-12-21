@@ -238,6 +238,7 @@ export default {
       minDate: new Date(2010, 0, 1),
       maxDate: new Date(2050, 10, 1),
       calendarShow: false,
+      sourcePath: '',
       calendarMorningShow: false,
       calendarAfternoonShow: false,
       calendarPng: require("@/common/images/home/calendar.png"),
@@ -415,9 +416,16 @@ export default {
 
   },
 
+  beforeRouteEnter(to, from, next) {
+    next(vm=>{
+        vm.sourcePath = from.path
+    });
+    next() 
+  },
+
   mounted() {
     // 控制设备物理返回按键
-    this.deviceReturn("/home");
+    this.deviceReturn(this.sourcePath);
     this.getCleanAttendanceList();
     this.getWorkerList()
   },
@@ -430,7 +438,7 @@ export default {
     ...mapMutations([]),
 
     onClickLeft() {
-      this.$router.push({ path: "/home"})
+      this.$router.push({ path: this.sourcePath})
     },
 
     // 考勤类型选择弹框关闭前事件

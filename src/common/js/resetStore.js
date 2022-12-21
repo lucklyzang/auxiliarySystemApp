@@ -10,7 +10,8 @@ export function getDefaultLoginState() {
         timeMessage: {}, //阿里云签名过期时间信息
         ossMessage: {}, //阿里云签名信息
         chooseProject: [], //选择的医院 
-        hospitalMessage: {} //医院信息
+        hospitalMessage: {}, //医院信息
+        attendanceManagement: '' //进入考勤管理页面的来源页面路径
     }
 };
 // 陪护管理信息store的初始值

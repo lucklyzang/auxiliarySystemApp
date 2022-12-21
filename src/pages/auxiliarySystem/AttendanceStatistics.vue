@@ -66,7 +66,7 @@
                </div>
            </div> 
             <div class="content-center">
-                <van-circle v-model="currentRate" :rate="50" :speed="100" layer-color="#d0d0cc" :size="130" :stroke-width="50">
+                <van-circle v-model="currentRate" :rate="currentRate" :speed="100" :color="currentRate > 0 ? '#1989fa' : '#d0d0cc'" layer-color="#d0d0cc" :size="130" :stroke-width="50">
                 <template #default>
                         <div>
                             {{`${actualArrival}/${total}`}}
@@ -93,7 +93,7 @@
                 </div>
             </div>
             <div class="cotent-bottom">
-                <van-tabs v-model="activeObjectName" color="#174E97" @change="vanTabsChangeEvent">
+                <van-tabs v-model="activeObjectName" color="#1864FF" @change="vanTabsChangeEvent">
                     <van-tab title="出勤" name="attendance">
                         <van-empty description="暂无数据" v-show="attendanceEmptyShow" />
                         <div class="attendance-situation-list" v-for="(item,index) in attendanceSituationList" :key="index">
@@ -238,7 +238,7 @@ export default {
       actualArrival: '',
       total: '',
       activeObjectName: 'attendance',
-      currentRate: 50,
+      currentRate: 0,
       attendanceStatusIndex: null,
       statisticalTypeIndex: 0,
       currentDayDate: new Date(),
@@ -353,6 +353,16 @@ export default {
     },
 
     onClickRight () {
+        let temporarySwitchMessage = this.attendanceStatisticsSwitchMessage;
+        temporarySwitchMessage['switchIndex'] = this.statisticalTypeIndex;
+        if (this.statisticalTypeIndex == 0) {
+            temporarySwitchMessage['date'] = this.currentDayDate
+        } else if (this.statisticalTypeIndex == 1) {
+            temporarySwitchMessage['date'] = this.currentMonthDate
+        } else if (this.statisticalTypeIndex == 2) {
+            temporarySwitchMessage['date'] = this.currentPersonDate
+        };
+        this.storeAttendanceStatisticsSwitchMessage(temporarySwitchMessage);
         this.$router.push({path: '/attendanceManagement'})
     },
 
@@ -526,6 +536,7 @@ export default {
 		if (res && res.data.code == 200) {
             this.actualArrival = res.data.data.arrive;
             this.total = res.data.data.total;
+            this.currentRate = Math.ceil((this.actualArrival/this.total)*100);
             for (let item of this.attendanceStatusList) {
                 if (item.name == '出勤') {
                     item.num = res.data.data.chuQin
@@ -674,18 +685,23 @@ export default {
   .nav {
     /deep/ .van-nav-bar {
         .van-nav-bar__left {
-        .van-nav-bar__text {
-            color: black !important;
-            margin-left: 8px !important;
-        }
+            .van-nav-bar__text {
+                color: black !important;
+                margin-left: 8px !important;
+            }
+        };
+        .van-nav-bar__right {
+            .van-nav-bar__text {
+                font-weight: bold !important
+            }
         }
         .van-icon {
-        color: black !important;
-        font-size: 22px !important;
+            color: black !important;
+            font-size: 22px !important;
         }
         .van-nav-bar__title {
-        color: black !important;
-        font-size: 16px !important;
+            color: black !important;
+            font-size: 16px !important;
         }
     }
   };
@@ -721,7 +737,8 @@ export default {
             .statisticalTypeListStyle {
                 background: #fff !important;
                 border-radius: 8px !important;
-                color: #1864FF !important
+                color: #1864FF !important;
+                font-weight: bold !important
             }
         }
     };
@@ -915,7 +932,7 @@ export default {
                         color: #d0d0cc !important
                     };
                     .van-tab--active {
-                        color: #174E97 !important
+                        color: #1864FF !important
                     }
                 };
                 .van-tabs__content {
