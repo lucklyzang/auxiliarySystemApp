@@ -98,7 +98,7 @@
                         <van-empty description="暂无数据" v-show="attendanceEmptyShow" />
                         <div class="attendance-situation-list" v-for="(item,index) in attendanceSituationList" :key="index">
                             <div class="attendance-situation-left">
-                                {{ item.workerName}}
+                                {{ `${item.postName}-${item.workerName}`}}
                             </div>
                             <div class="attendance-situation-right">
                                 <span>出勤:</span>
@@ -948,7 +948,8 @@ export default {
                         padding: 20px;
                         box-sizing: border-box;
                         .attendance-situation-left {
-                            width: 50%;
+                            width: 70%;
+                            word-break: break-all
                         };
                         .attendance-situation-right {
                             width: 50%;
