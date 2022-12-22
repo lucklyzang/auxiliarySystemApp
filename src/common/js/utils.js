@@ -569,6 +569,7 @@ export const removeAllLocalStorage = () => {
   // removeStore('userName');
   // removeStore('userPassword');
   removeStore('userInfo');
+  removeStore('hospitalMessage');
   removeStore('isLogin');
   removeStore('token');
   removeStore('isLogin');
@@ -592,6 +593,7 @@ export const removeAllLocalStorage = () => {
 export const removeExceptLoginMessageLocalStorage = () => {
   removeStore('timeMessage');
   removeStore('ossMessage');
+  removeStore('hospitalMessage');
   removeStore('chooseProject');
   removeStore('attendanceTypeDetailsMessage');
   removeStore('personnelStatisticsDetailsMessage')

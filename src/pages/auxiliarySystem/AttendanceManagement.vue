@@ -431,7 +431,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["userInfo"]),
+    ...mapGetters(["userInfo","chooseProject"]),
   },
 
   methods: {
@@ -469,7 +469,7 @@ export default {
     getWorkerList () {
         this.substitutePersonMorningValueOption = [{ text: '请选择', value: 0 }];
         this.substitutePersonAfternoonValueOption = [{ text: '请选择', value: 0 }];
-        cleanbxWorkerList({proId:this.userInfo.proIds[0],permissions:'adj:oper:repair'}).then((res) => {
+        cleanbxWorkerList({proId:this.chooseProject.proId,permissions:'adj:oper:repair'}).then((res) => {
             if (res && res.data.code == 200) {
                 if (res.data.data.length > 0) {
                     for (let item of res.data.data) {
@@ -577,7 +577,7 @@ export default {
       this.overlayShow = true;
       this.emptyShow = false;
       this.loadingText = '加载中···';
-      cleanAttendanceList({proId: this.userInfo.proIds[0],date: this.getNowFormatDate(this.currentDayDate,'day'),name: searchText,system: 5}).then((res) => {
+      cleanAttendanceList({proId: this.chooseProject.proId,date: this.getNowFormatDate(this.currentDayDate,'day'),name: searchText,system: 5}).then((res) => {
         this.loadingShow = false;
         this.overlayShow = false;
 		if (res && res.data.code == 200) {
@@ -833,7 +833,7 @@ export default {
                 date: this.getNowFormatDate(this.currentMorningDate,'day'), //日期 yyyy-MM-dd
                 afternoon: this.afternoonAttendanceRadioValue, //下午考勤类型
                 content: '', //备注 非必输
-                proId: this.userInfo.proIds[0], //医院ID
+                proId: this.chooseProject.proId, //医院ID
                 modifyName: this.userInfo.name, //提交者
                 substitute: this.substitutePersonMorningValue == 0 ? '' : this.substitutePersonMorningValue, //上午调班者ID  非必输
                 afSubstitute: this.substitutePersonAfternoonValue == 0 ? '' : this.substitutePersonAfternoonValue //下午调班者ID 非必输

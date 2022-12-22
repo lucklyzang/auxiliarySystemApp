@@ -126,7 +126,7 @@ export default {
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo","timeMessage","ossMessage","chooseProject","locationMessage"]),
+    ...mapGetters(["userInfo","timeMessage","ossMessage","locationMessage"]),
   },
 
   methods: {

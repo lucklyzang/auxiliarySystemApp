@@ -9,7 +9,7 @@ export function getDefaultLoginState() {
         overDueWay: false, // 过期方式
         timeMessage: {}, //阿里云签名过期时间信息
         ossMessage: {}, //阿里云签名信息
-        chooseProject: [], //选择的医院 
+        chooseProject: null, //选择的医院 
         hospitalMessage: {} //医院信息
     }
 };

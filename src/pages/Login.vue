@@ -39,13 +39,15 @@
     <div class="hospital-select-box">
       <van-dialog v-model="dialogShow"
         title="选择医院"
+        :before-close="beforeCloseEvent"
+        close-on-click-overlay
         @confirm="dialongSure"
       >
         <div class="task-content">
           <van-dropdown-menu 
             active-color="#1864FF"
           >
-            <van-dropdown-item v-model="hospitalValue" :options="hospitalOption" />
+            <van-dropdown-item v-model="hospitalValue" :options="hospitalOption" @change="hospitalOptionChange" />
           </van-dropdown-menu>
         </div>
       </van-dialog>
@@ -68,26 +70,16 @@ export default {
       loadingShow: false,
       overlayShow: false,
       checked: false,
-      hospitalList: [],
-      hospitalValue: 0,
-      hospitalOption: [
-        { text: '请选择医院', value: 0 },
-        { text: '全部商品', value: 1 },
-        { text: '新款商品', value: 2 },
-        { text: '活动商品', value: 3 },
-        { text: '请选择医院', value: 4 },
-        { text: '全部商品', value: 5 },
-        { text: '新款商品', value: 6 },
-        { text: '活动商品', value: 7 }
-      ],
-			selectHospitalList: [],
+      hospitalValue: null,
+      selectValue: '',
+      hospitalOption: [],
       loginBackgroundPng: require("@/common/images/login/login-background.png"),
       projectLogoPng: require("@/common/images/login/project-logo.png"),
     };
   },
 
   computed: {
-    ...mapGetters(['userInfo']),
+    ...mapGetters(['userInfo','chooseProject']),
   },
 
   mounted() {
@@ -109,11 +101,37 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["storeUserInfo","changeIsLogin","changePermissionInfo","changeRoleNameList","changeOverDueWay","changeHospitalMessage"]),
+    ...mapMutations(["storeUserInfo","changeIsLogin","changePermissionInfo","changeRoleNameList","changeChooseProject","changeOverDueWay","changeHospitalMessage"]),
 
     // 医院选择弹框事件
     dialongSure () {
+      if (!this.selectValue) {
+        return
+      };
+      this.changeChooseProject({
+        hospitalName: this.userInfo.hospitalList.filter((item) => { return item.id == this.selectValue })[0]['hospitalName'],
+        name: this.userInfo.hospitalList.filter((item) => { return item.id == this.selectValue })[0]['name'],
+        proId: this.selectValue
+      });
+      this.queryHospitalMessage(this.selectValue)
+    },
 
+    // 弹框关闭前的事件
+    beforeCloseEvent (action, done) {
+      if (action == 'confirm') {
+        if (!this.selectValue) {
+          this.$toast('请选择医院');
+          done(false);
+          return
+        }
+      } else {
+        done()
+      }
+    },
+
+    // 医院列表选值值变化事件
+    hospitalOptionChange (value) {
+      this.selectValue = value
     },
 
     // 登录事件
@@ -127,6 +145,7 @@ export default {
 			logIn(qs.stringify(loginMessage)).then((res) => {
         this.loadingShow = false;
         this.overlayShow = false;
+        this.hospitalOption = [{ text: '请选择医院', value: null}];
         if (res && res.data.code == 200) {
           // 登录用户名密码及用户信息存入Locastorage
           // 判断是否勾选记住用户名密码
@@ -142,17 +161,14 @@ export default {
           this.storeUserInfo(res.data.data.worker);
           this.changePermissionInfo(res.data.data.authorities);
           this.changeRoleNameList(res.data.data.roleNameList);
-          if (this.userInfo.hospitalList.length > 1) {
-            this.hospitalList = [];
-            this.selectHospitalList = [];
-            for (let item of this.userInfo.hospitalList) {
-              this.hospitalList.push({
-                value: item.hospitalName,
-                id: item.id
-              })
-            }
+          for (let item of this.userInfo.hospitalList) {
+            this.hospitalOption.push({
+              text: item.name,
+              hospitalName: item.hospitalName,
+              value: item.id
+            })
           };
-          this.queryHospitalMessage(this.userInfo.proIds[0])
+          this.dialogShow = true;
         } else {
           this.$toast({
             type: 'fail',
@@ -171,10 +187,10 @@ export default {
     },
     
     // 查询医院信息
-    queryHospitalMessage (ProId) {
+    queryHospitalMessage (proId) {
       this.loadingShow = true;
       this.overlayShow = true;
-      getHospitalMessage(ProId).then((res) => {
+      getHospitalMessage(proId).then((res) => {
         this.loadingShow = false;
         this.overlayShow = false;
         if (res && res.data.code == 200) {

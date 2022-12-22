@@ -343,7 +343,7 @@ export default {
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo","personnelStatisticsDetailsMessage","attendanceTypeDetailsMessage","attendanceStatisticsSwitchMessage"])
+    ...mapGetters(["userInfo","personnelStatisticsDetailsMessage","chooseProject","attendanceTypeDetailsMessage","attendanceStatisticsSwitchMessage"])
   },
 
   methods: {
@@ -528,7 +528,7 @@ export default {
       this.loadingShow = true;
       this.overlayShow = true;
       this.statisticsBoxShow = false;
-      cleanAttendanceDay({proId: this.userInfo.proIds[0],date: this.getNowFormatDate(this.currentDayDate,'day'),system:5}).then((res) => {
+      cleanAttendanceDay({proId: this.chooseProject.proId,date: this.getNowFormatDate(this.currentDayDate,'day'),system:5}).then((res) => {
         console.log('阿萨飒飒',res.data);
         this.loadingShow = false;
         this.overlayShow = false;
@@ -589,7 +589,7 @@ export default {
       this.loadingShow = true;
       this.overlayShow = true;
       this.statisticsBoxShow = false;
-      cleanAttendanceMonth({proId: this.userInfo.proIds[0],month: this.getNowFormatDate(this.currentMonthDate,'month'),system:5}).then((res) => {
+      cleanAttendanceMonth({proId: this.chooseProject.proId,month: this.getNowFormatDate(this.currentMonthDate,'month'),system:5}).then((res) => {
         this.loadingShow = false;
         this.overlayShow = false;
         this.statisticsBoxShow = true;
@@ -644,7 +644,7 @@ export default {
       this.personStatisticalEmptyShow = false;
       this.statisticsBoxShow = false;
       this.personnelStatisticsList = [];
-      cleanAttendancePeople({proId: this.userInfo.proIds[0],month: this.getNowFormatDate(this.currentPersonDate,'person'),system:5}).then((res) => {
+      cleanAttendancePeople({proId: this.chooseProject.proId,month: this.getNowFormatDate(this.currentPersonDate,'person'),system:5}).then((res) => {
         this.loadingShow = false;
         this.overlayShow = false;
         this.statisticsBoxShow = true;

@@ -187,7 +187,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["userInfo","personnelStatisticsDetailsMessage"])
+    ...mapGetters(["userInfo","personnelStatisticsDetailsMessage","chooseProject"])
   },
 
   methods: {
@@ -426,7 +426,7 @@ export default {
       this.loadingShow = true;
       this.overlayShow = true;
       this.statisticsBoxShow = false;
-      cleanAttendancePeopleInfo({proId: this.userInfo.proIds[0],workerId: this.personnelStatisticsDetailsMessage.content.id, month: this.getNowFormatDate(this.currentPersonDate, 'person'),system:5}).then((res) => {
+      cleanAttendancePeopleInfo({proId: this.chooseProject.proId,workerId: this.personnelStatisticsDetailsMessage.content.id, month: this.getNowFormatDate(this.currentPersonDate, 'person'),system:5}).then((res) => {
         this.loadingShow = false;
         this.overlayShow = false;
         this.statisticsBoxShow = true;

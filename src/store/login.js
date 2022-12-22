@@ -10,6 +10,7 @@ export default {
         },
 
         hospitalMessage: (state) => {
+            state.hospitalMessage = JSON.parse(getStore('hospitalMessage')) ? JSON.parse(getStore('hospitalMessage')) : {};
             return state.hospitalMessage
         },
 
@@ -24,7 +25,7 @@ export default {
         },
 
         chooseProject: (state) => {
-            state.chooseProject = JSON.parse(getStore('chooseProject')) ? JSON.parse(getStore('chooseProject')) : [];
+            state.chooseProject = JSON.parse(getStore('chooseProject')) ? JSON.parse(getStore('chooseProject')) : {};
             return state.chooseProject
         },
 
@@ -67,7 +68,10 @@ export default {
 
         // 保存医院信息
         changeHospitalMessage (state, playLoad) {
-            state.hospitalMessage = playLoad
+            if (playLoad && playLoad != 'null') {
+                setStore('hospitalMessage', playLoad);
+                state.hospitalMessage = playLoad
+            }
         },
         
         // 保存token
@@ -126,7 +130,7 @@ export default {
             }
 		},
 
-        //保存选择的项目
+        //保存选择的医院
         changeChooseProject (state, playLoad) {
             if (playLoad != 'null') {
                 setStore('chooseProject', playLoad);
