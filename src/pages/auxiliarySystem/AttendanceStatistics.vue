@@ -140,7 +140,7 @@
                 <div class="personnel-statistics-list" v-for="(item,index) in personnelStatisticsList" :key="index">
                     <div class="personnel-statistics-title">
                         <div class="personnel-statistics-title-left">
-                            {{ item.name }}
+                            {{ `${item.postName}-${item.name}` }}
                         </div>
                         <div class="personnel-statistics-title-right">
                             <span>满勤天数</span>
@@ -1109,7 +1109,11 @@ export default {
                     .personnel-statistics-title-left {
                         font-size: 16px;
                         color: #101010;
-                        font-weight: bold
+                        font-weight: bold;
+                        flex: 1;
+                        padding-right: 8px;
+                        box-sizing: border-box;
+                        .no-wrap()
                     };
                     .personnel-statistics-title-right {
                         >span {
