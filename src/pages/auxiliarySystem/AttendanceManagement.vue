@@ -152,13 +152,13 @@
             </div>
         </div>
         <div class="content-center" v-show="isShowCheckbox">
-            <van-checkbox shape="square" v-model="allChecked" icon-size="25px" @click="allCheckedChange">全选</van-checkbox>
+            <van-checkbox v-model="allChecked" icon-size="25px" @click="allCheckedChange">全选</van-checkbox>
         </div>
         <div class="content-bottom">
            <van-empty description="暂无数据" v-show="emptyShow" />
            <div class="person-attendance-status-list" v-show="!emptyShow" v-for="(item,index) in personAttendanceStatusList" :key="index" @click="personAttendanceClickEvent(item,index)">
                 <div class="check-box" v-show="isShowCheckbox">
-                    <van-checkbox shape="square" v-model="item.checked" icon-size="30px" @click.stop.native="emptyHandle"></van-checkbox>
+                    <van-checkbox v-model="item.checked" icon-size="30px" @click.stop.native="emptyHandle"></van-checkbox>
                 </div>
                 <div class="attendance-status-right" v-show="!isShowCheckbox">
                     <van-icon name="arrow" size="25" color="#1864FF" />
@@ -197,7 +197,7 @@
         </div>
     </div>
     <div class="btn-box-two" v-show="isShowCheckbox && !emptyShow">
-        <div class="cancel-choose" @click="cancelChooseEvent">取消选择</div>
+        <div class="cancel-choose" @click="cancelChooseEvent">取消批量</div>
         <div class="sure-choose" @click="sureChooseEvent">确定选择</div>
     </div>
   </div>
@@ -1264,16 +1264,17 @@ export default {
         width: 100%;
         margin: 0 auto;
         padding: 10px 4px;
+        background: #F8F8F8;
         box-sizing: border-box;
+        padding-left: 10px;
         /deep/ .van-checkbox {
-            justify-content: flex-end !important
         }
     };
     .content-bottom {
         width: 100%;
         background: #F8F8F8;
         flex: 1;
-        padding: 10px 4px 0 4px;
+        padding: 0 4px 0 4px;
         overflow: auto;
         box-sizing: border-box;
         position: relative;
@@ -1296,8 +1297,9 @@ export default {
             position: relative;
             .check-box {
                 position: absolute;
-                top: 0;
-                right: 0
+                top: 50%;
+                transform: translateY(-50%);
+                right: 10px
             };
             .attendance-status-right {
                 position: absolute;
@@ -1373,22 +1375,23 @@ export default {
  .btn-box-two {
     height: 80px;
     display: flex;
-    width: 90%;
+    width: 100%;
     margin: 0 auto;
     align-items: center;
-    justify-content: space-between;
+    background: #F8F8F8;
+    justify-content: center;
     >div {
-      width: 48%;
+      width: 40%;
       height: 48px;
       font-size: 18px;
       line-height: 48px;
       background: #fff;
       text-align: center;
       border-radius: 30px;
-      font-weight: bold;
       &:first-child {
         color: #1864FF;
         box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
+        margin-right: 20px
       };
        &:last-child {
         color: #fff;
