@@ -1366,7 +1366,6 @@ export default {
             box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
             color: #fff;
             border-radius: 30px;
-            font-weight: bold;
             margin-top: 20px;
             margin-bottom: 20px;
             text-align: center
