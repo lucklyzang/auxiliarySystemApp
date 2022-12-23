@@ -11,8 +11,8 @@
         >
         <div class="dialog-top">
             <div class="select-title">选择上午考勤</div>
-            <van-radio-group @change="forenoonAttendanceRadioChange" v-model="forenoonAttendanceRadioValue" direction="horizontal">
-                <van-radio :name="item.value" :disabled="item.disabled" checked-color="#1864FF" v-for="(item) in forenoonAttendanceTypeList" :key="item.name">{{ item.name }}</van-radio>
+            <van-radio-group v-model="forenoonAttendanceRadioValue" direction="horizontal">
+                <van-radio @click="forenoonAttendanceRadioChange" :name="item.value" :disabled="item.disabled" checked-color="#1864FF" v-for="(item) in forenoonAttendanceTypeList" :key="item.name">{{ item.name }}</van-radio>
             </van-radio-group>
             <div class="change-shift-box" v-show="isShowForenoonChangeShiftBox">
                 <div class="change-shift-box-top">
@@ -49,8 +49,8 @@
         </div>
         <div class="dialog-bottom">
             <div class="select-title">选择下午考勤</div>
-            <van-radio-group  @change="afternoonAttendanceRadioChange" v-model="afternoonAttendanceRadioValue" direction="horizontal">
-                <van-radio :name="item.value" :disabled="item.disabled" checked-color="#1864FF" v-for="(item) in afteroonAttendanceTypeList" :key="item.name">{{ item.name }}</van-radio>
+            <van-radio-group v-model="afternoonAttendanceRadioValue" direction="horizontal">
+                <van-radio @click="afternoonAttendanceRadioChange" :name="item.value" :disabled="item.disabled" checked-color="#1864FF" v-for="(item) in afteroonAttendanceTypeList" :key="item.name">{{ item.name }}</van-radio>
             </van-radio-group>
              <div class="change-shift-box" v-show="isShowAfternoonChangeShiftBox">
                 <div class="change-shift-box-top">
@@ -243,13 +243,13 @@ export default {
       calendarAfternoonShow: false,
       calendarPng: require("@/common/images/home/calendar.png"),
       isShowCheckbox: false,
-      substitutePersonMorningValue: 0,
-      substitutePersonAfternoonValue: 0,
+      substitutePersonMorningValue: null,
+      substitutePersonAfternoonValue: null,
       substitutePersonMorningValueOption: [
-        { text: '请选择', value: 0 }
+        { text: '请选择', value: null }
       ],
        substitutePersonAfternoonValueOption: [
-        { text: '请选择', value: 0 }
+        { text: '请选择', value: null }
       ],
       forenoonAttendanceTypeList: [
         {
@@ -377,16 +377,15 @@ export default {
     // 监听考勤类型弹出框上午选中值的变化
     forenoonAttendanceRadioValue: {
         handler: function(newVal, oldVal) {
+            console.log('新旧',newVal,oldVal);
             if (newVal == 5) {
                 // 调班
-                this.substitutePersonMorningValue = 0;
                 this.isShowForenoonChangeShiftBox = true
             } else {
                 this.isShowForenoonChangeShiftBox = false
             };
             if (newVal == 2 || newVal == 4 || newVal == 6 || newVal == 10 || newVal == 7 || newVal == 9) {
-                this.isShowForenoonDurationBox = true; 
-                this.currentMorningDuration = ''
+                this.isShowForenoonDurationBox = true
             } else {
                 this.isShowForenoonDurationBox = false
             }
@@ -399,14 +398,12 @@ export default {
         handler: function(newVal, oldVal) {
            if (newVal == 5) {
             // 调班
-            this.substitutePersonAfternoonValue = 0;
             this.isShowAfternoonChangeShiftBox = true
             } else {
                 this.isShowAfternoonChangeShiftBox = false
             };
             if (newVal == 2 || newVal == 4 || newVal == 6 || newVal == 10 || newVal == 7 || newVal == 9) {
-                this.isShowAfternoonDurationBox = true;
-                this.currentAfternoonDuration = ''
+                this.isShowAfternoonDurationBox = true
             } else {
                 this.isShowAfternoonDurationBox = false
             }
@@ -467,8 +464,8 @@ export default {
 
     // 查询保洁员列表
     getWorkerList () {
-        this.substitutePersonMorningValueOption = [{ text: '请选择', value: 0 }];
-        this.substitutePersonAfternoonValueOption = [{ text: '请选择', value: 0 }];
+        this.substitutePersonMorningValueOption = [{ text: '请选择', value: null }];
+        this.substitutePersonAfternoonValueOption = [{ text: '请选择', value: null }];
         cleanbxWorkerList({proId:this.chooseProject.proId,permissions:'adj:oper:repair'}).then((res) => {
             if (res && res.data.code == 200) {
                 if (res.data.data.length > 0) {
@@ -688,12 +685,18 @@ export default {
 
     emptyHandle () {},
 
-    // 上午考勤单选框值变化事件
+    // 上午考勤单选框点击事件
     forenoonAttendanceRadioChange (value) {
+        if(this.isShowForenoonDurationBox) {
+            this.currentMorningDuration = ''
+        }
     },
 
-    // 下午考勤单选框值变化事件
+    // 下午考勤单选框点击事件
     afternoonAttendanceRadioChange (value) {
+        if (this.isShowAfternoonDurationBox) {
+            this.currentAfternoonDuration = ''
+        }
     },
 
     // 批量处理事件
@@ -735,6 +738,7 @@ export default {
 
     //考勤人员列表点击事件
     personAttendanceClickEvent(item,index) {
+        console.log(item);
         if (this.isShowCheckbox) { return };
         this.isClickSureSelectBtn = false;
         this.editMessage = item;
@@ -756,7 +760,7 @@ export default {
             if (this.forenoonAttendanceRadioValue == 5) {
                 this.isShowForenoonChangeShiftBox = true
             };
-            if (this.forenoonAttendanceRadioValue == 4 || this.forenoonAttendanceRadioValue == 6 || this.forenoonAttendanceRadioValue == 10 || this.forenoonAttendanceRadioValue == 7 || this.forenoonAttendanceRadioValue == 9) {
+            if (this.forenoonAttendanceRadioValue == 2 || this.forenoonAttendanceRadioValue == 4 || this.forenoonAttendanceRadioValue == 6 || this.forenoonAttendanceRadioValue == 10 || this.forenoonAttendanceRadioValue == 7 || this.forenoonAttendanceRadioValue == 9) {
                 this.isShowForenoonDurationBox = true
             };
         } else {
@@ -768,7 +772,7 @@ export default {
             if (this.afternoonAttendanceRadioValue == 5) {
                 this.isShowAfternoonChangeShiftBox = true
             }
-            if (this.afternoonAttendanceRadioValue == 4 || this.afternoonAttendanceRadioValue == 6 || this.afternoonAttendanceRadioValue == 10 || this.afternoonAttendanceRadioValue == 7 || this.afternoonAttendanceRadioValue == 9) {
+            if (this.forenoonAttendanceRadioValue == 2 || this.afternoonAttendanceRadioValue == 4 || this.afternoonAttendanceRadioValue == 6 || this.afternoonAttendanceRadioValue == 10 || this.afternoonAttendanceRadioValue == 7 || this.afternoonAttendanceRadioValue == 9) {
                 this.isShowAfternoonDurationBox = true
             }
         } else {
@@ -776,7 +780,7 @@ export default {
         };
         // 回显上午时长
         if (item.duration) {
-            this.currentMorningDuration = item.duration
+            this.currentMorningDuration = item.duration;
         } else {
             this.currentMorningDuration = ''
         }
@@ -790,13 +794,13 @@ export default {
         if (item.substitute) {
             this.substitutePersonMorningValue = item.substitute
         } else {
-            this.substitutePersonMorningValue = 0
+            this.substitutePersonMorningValue = null
         }
         // 回显下午替班人
         if (item.afSubstitute) {
             this.substitutePersonAfternoonValue = item.afSubstitute
         } else {
-            this.substitutePersonAfternoonValue = 0
+            this.substitutePersonAfternoonValue = null
         }
     },
 
@@ -835,8 +839,8 @@ export default {
                 content: '', //备注 非必输
                 proId: this.chooseProject.proId, //医院ID
                 modifyName: this.userInfo.name, //提交者
-                substitute: this.substitutePersonMorningValue == 0 ? '' : this.substitutePersonMorningValue, //上午调班者ID  非必输
-                afSubstitute: this.substitutePersonAfternoonValue == 0 ? '' : this.substitutePersonAfternoonValue //下午调班者ID 非必输
+                substitute: this.substitutePersonMorningValue == null ? '' : this.substitutePersonMorningValue, //上午调班者ID  非必输
+                afSubstitute: this.substitutePersonAfternoonValue == null ? '' : this.substitutePersonAfternoonValue //下午调班者ID 非必输
             };
             console.log('提交的编辑信息',temporaryEditMessage);
             this.updateCleanAttendance(temporaryEditMessage)
