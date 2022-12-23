@@ -888,14 +888,17 @@ export default {
   };      
   /deep/ .van-dialog {
       top: auto !important;
+      left: 0 !important;
+      border-right: 1px solid #fff;
       bottom: 0 !important;
       border-top-left-radius: 20px !important;
       border-top-right-radius: 20px !important;
       border-bottom-left-radius: 0 !important;
       border-bottom-right-radius: 0 !important;
-      transform: translate3d(-50%,0,0) !important;
+      transform: translate3d(0,0,0) !important;
       .van-dialog__content {
         padding: 20px 20px 10px 20px !important;
+        box-sizing: border-box;
         .dialog-top {
             .select-title {
                 font-size: 16px;

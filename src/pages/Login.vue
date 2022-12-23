@@ -38,7 +38,8 @@
     <!-- 选择医院弹框 -->
     <div class="hospital-select-box">
       <van-dialog v-model="dialogShow"
-        title="选择医院"
+        title="请选择医院"
+        width="98%"
         :before-close="beforeCloseEvent"
         close-on-click-overlay
         @confirm="dialongSure"
@@ -46,8 +47,9 @@
         <div class="task-content">
           <van-dropdown-menu 
             active-color="#1864FF"
+            z-index="40000"
           >
-            <van-dropdown-item v-model="hospitalValue" :options="hospitalOption" @change="hospitalOptionChange" />
+            <van-dropdown-item get-container="getContainer" v-model="hospitalValue" :options="hospitalOption" @change="hospitalOptionChange" />
           </van-dropdown-menu>
         </div>
       </van-dialog>
@@ -102,6 +104,11 @@ export default {
 
   methods: {
     ...mapMutations(["storeUserInfo","changeIsLogin","changePermissionInfo","changeRoleNameList","changeChooseProject","changeOverDueWay","changeHospitalMessage"]),
+
+    // 返回一个特定的 DOM 节点，作为挂载的父节点
+    getContainer() {
+      return document.querySelector('.hospital-select-box');
+    },
 
     // 医院选择弹框事件
     dialongSure () {
@@ -220,10 +227,15 @@ export default {
 @import "~@/common/stylus/mixin.less";
 @import "~@/common/stylus/modifyUi.less";
 .container {
+  /deep/ .van-popup {
+    z-index: 300000 !important
+  };
   .hospital-select-box {
        /deep/ .van-dialog {
-        border-radius: 0;
-        width: 98%;
+        left: 1% !important;
+        top: 50% !important;
+        border-radius: 0 !important;
+        transform: translate3d(0,-50%,0) !important;
         .van-dialog__header {
           text-align: left;
           padding: 5px 0;
@@ -233,9 +245,9 @@ export default {
         .van-dialog__content {
           min-height: 300px;
           overflow: auto;
+          padding: 0 6px 6px 6px !important;
+          box-sizing: border-box;
           .task-content {
-            padding: 0 6px 6px 6px;
-            box-sizing: border-box;
             /deep/ .van-dropdown-menu {
               .van-dropdown-menu__bar {
                 box-shadow: none;
@@ -257,8 +269,15 @@ export default {
                 }
               };
               .van-dropdown-item {
-                z-index: 10000;
-                top: 70px !important
+                top: 71px !important;
+                .van-dropdown-item__content {
+                  .van-cell {
+                    padding: 8px 6px !important;
+                    .van-cell__title {
+                      padding: 0 6px !important;
+                    }
+                  }
+                }
               }
             }
           }
