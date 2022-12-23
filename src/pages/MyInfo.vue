@@ -54,7 +54,7 @@
 					</span>
 				</div>
 			</div>
-			<div class="content-top-other">
+			<!-- <div class="content-top-other">
 				<div class="left">
 					<span>
 						<img :src="accountExpirationTimePng" />
@@ -66,13 +66,13 @@
 						无
 					</span>
 				</div>
-			</div>
+			</div> -->
 			<div class="content-top-other">
 				<div class="left">
 					<span>
 						<img :src="userRolePng" />
 					</span>
-					<span>用户角色</span>
+					<span>用户岗位</span>
 				</div>
 				<div class="right">
 					<span v-for="(item,index) in roleNameList" :key="index">
