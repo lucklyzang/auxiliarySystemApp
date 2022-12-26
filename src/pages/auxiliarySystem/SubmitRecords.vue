@@ -110,6 +110,7 @@ export default {
       radioValue: '1',
       deleteInfoDialogShow: false,
       overlayShow: false,
+      isExpire: false,
       loadingShow: false,
       loadText: '创建中',
       enterRemark: "",
