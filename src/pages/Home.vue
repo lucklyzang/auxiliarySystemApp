@@ -87,6 +87,11 @@
                 "changeChooseProject"
             ]),
 
+            dropDownClick(e) {
+		        console.log(e)
+            },
+
+
             // 头像点击事件
             userInfoEvent () {
                 this.$router.push({path: '/myInfo'})
