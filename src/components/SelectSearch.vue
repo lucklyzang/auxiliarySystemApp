@@ -21,6 +21,7 @@
  
 <script>
  export default {
+  name: 'SelectSearch',
   data(){
 		return {
 			searchValue: '',
