@@ -17,6 +17,10 @@ export default {
             return state.personInfo
         },
 
+        scanPhotoAndroidMessage : (state) => {
+            return state.scanPhotoAndroidMessage
+        },
+
         attendanceTypeDetailsMessage : (state) => {
             state.attendanceTypeDetailsMessage = getStore('attendanceTypeDetailsMessage') ? JSON.parse(getStore('attendanceTypeDetailsMessage')) : {};
             return state.attendanceTypeDetailsMessage
@@ -35,6 +39,13 @@ export default {
             if (playLoad && playLoad != 'null') {
                 setStore('attendanceTypeDetailsMessage', playLoad);
                 state.attendanceTypeDetailsMessage = playLoad
+            }
+        },
+
+        // 保存安卓扫码和拍照后的信息数据
+        storeScanPhotoAndroidMessage(state, playLoad) {
+            if (playLoad && playLoad != 'null') {
+                state.scanPhotoAndroidMessage = playLoad
             }
         },
 

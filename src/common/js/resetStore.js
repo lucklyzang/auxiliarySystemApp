@@ -10,16 +10,18 @@ export function getDefaultLoginState() {
         timeMessage: {}, //阿里云签名过期时间信息
         ossMessage: {}, //阿里云签名信息
         chooseProject: null, //选择的医院 
-        hospitalMessage: {} //医院信息
+        hospitalMessage: {}, //医院信息
+        departmentsMessage: [] //科室信息
     }
 };
-// 陪护管理信息store的初始值
+// 特殊辅助信息store的初始值
 export function getDefaultAuxiliaryModuleState() {
     return {
        attendanceTypeDetailsMessage: {},
        personInfo: {},
        personnelStatisticsDetailsMessage: {},
        locationMessage: [],
+       scanPhotoAndroidMessage: {},
        attendanceStatisticsSwitchMessage: {}
     }
 };

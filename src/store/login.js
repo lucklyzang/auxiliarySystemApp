@@ -14,6 +14,10 @@ export default {
             return state.hospitalMessage
         },
 
+        departmentsMessage:  (state) => {
+            return state.departmentsMessage
+        },
+
         token: (state) => {
             state.token = getStore('token') ? getStore('token') : null;
             return state.token
@@ -71,6 +75,13 @@ export default {
             if (playLoad && playLoad != 'null') {
                 setStore('hospitalMessage', playLoad);
                 state.hospitalMessage = playLoad
+            }
+        },
+
+        // 保存科室信息
+        changeDepartmentsMessage (state, playLoad) {
+            if (playLoad && playLoad != 'null') {
+                state.departmentsMessage = playLoad
             }
         },
         

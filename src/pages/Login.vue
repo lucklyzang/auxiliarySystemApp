@@ -59,7 +59,7 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
-import {logIn,getHospitalMessage} from '@/api/login.js'
+import {logIn,getHospitalMessage,getDepartmentsMessage} from '@/api/login.js'
 import { IsPC, setStore,  getStore, removeStore} from "@/common/js/utils";
 import qs from 'qs'
 export default {
@@ -81,7 +81,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(['userInfo','chooseProject']),
+    ...mapGetters(['userInfo','chooseProject','departmentsMessage']),
   },
 
   mounted() {
@@ -103,7 +103,7 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["storeUserInfo","changeIsLogin","changePermissionInfo","changeRoleNameList","changeChooseProject","changeOverDueWay","changeHospitalMessage"]),
+    ...mapMutations(["storeUserInfo","changeIsLogin","changePermissionInfo","changeRoleNameList","changeChooseProject","changeOverDueWay","changeHospitalMessage","changeDepartmentsMessage"]),
 
     // 返回一个特定的 DOM 节点，作为挂载的父节点
     getContainer() {
@@ -202,6 +202,37 @@ export default {
         this.overlayShow = false;
         if (res && res.data.code == 200) {
           this.changeHospitalMessage(res.data.data);
+          this.queryDepartmentsMessage(proId)
+        } else {
+          this.$toast({
+            type: 'fail',
+            message: res.msg
+          })
+        }
+      })
+      .catch((err) => {
+        this.loadingShow = false;
+        this.overlayShow = false;
+         this.$toast({
+          type: 'fail',
+          message: err
+        })
+      })
+    },
+
+    // 查询科室信息
+    queryDepartmentsMessage (proId) {
+      this.loadingShow = true;
+      this.overlayShow = true;
+      getDepartmentsMessage({
+        proId,
+        permissions: 'adjunct'
+      }).then((res) => {
+        this.loadingShow = false;
+        this.overlayShow = false;
+        if (res && res.data.code == 200) {
+          this.changeDepartmentsMessage(res.data.data);
+          console.log('科室信息',this.departmentsMessage);
           this.$router.push({ path: "/home" })
         } else {
           this.$toast({
@@ -219,6 +250,8 @@ export default {
         })
       })
     }
+
+    
   }
 }
 </script>

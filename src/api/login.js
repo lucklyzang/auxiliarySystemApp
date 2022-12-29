@@ -24,6 +24,15 @@ export function getHospitalMessage(proId) {
 	})
 }
 
+// 查询科室信息
+export function getDepartmentsMessage(data) {
+	return request({
+	    url: 'nblink/hospital/departments',
+	    method: 'get',
+		params: data
+	})
+}
+
 // 获取阿里云签名接口
 export function getAliyunSign() {
 	return request({

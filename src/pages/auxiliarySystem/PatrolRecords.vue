@@ -139,15 +139,27 @@ export default {
   },
 
   mounted() {
-    // 控制设备物理返回按键
-    this.deviceReturn("/scanQRCode");
+    // 控制设备物理返回按键测试
+    if (!IsPC()) {
+      let that = this;
+      pushHistory();
+      that.gotoURL(() => {
+        pushHistory();
+        if (that.scanPhotoAndroidMessage['isScanCode']) {
+          // 跳到扫码界面
+          window.android.openScanPage()
+        } else if (!that.scanPhotoAndroidMessage['isScanCode']) {
+          // 跳到拍照界面
+        }
+      })
+    };
     this.queryPatrolRecordsList(1)
   },
 
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo"])
+    ...mapGetters(["userInfo","scanPhotoAndroidMessage"])
   },
 
   methods: {

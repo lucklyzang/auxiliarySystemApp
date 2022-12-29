@@ -70,6 +70,28 @@
         },
 
         mounted() {
+            // 提供给原生app调用的方法
+			let me = this;
+            // 返回上一页
+			window['returnMethod'] = () => {
+				me.returnMethod()
+			};
+
+            // 查看巡查记录
+			window['patrolRecordMethod'] = () => {
+				me.patrolRecordMethod()
+			};
+
+            // 扫码回调和点击扫码方法
+            window['scanValueCallback'] = (stringValue) => {
+				me.scanValueCallback(stringValue)
+			};
+
+            // 点击拍照方法
+            window['takePhotosValueCallback'] = (stringValue) => {
+				me.takePhotosValueCallback(stringValue)
+			};
+            
         },
 
         watch: {},
@@ -78,17 +100,68 @@
             ...mapGetters([
                 'userInfo',
                 'isLogin',
-                'hospitalMessage'
+                'hospitalMessage',
+                'scanPhotoAndroidMessage'
             ])
         },
 
         methods: {
             ...mapMutations([
-                "changeChooseProject"
+                "storeScanPhotoAndroidMessage"
             ]),
 
             dropDownClick(e) {
 		        console.log(e)
+            },
+
+            // 返回上一页
+            returnMethod () {
+                this.$router.push({ path: "/home"})
+            },
+
+            // 查看巡查记录
+            patrolRecordMethod () {
+                this.$router.push({ path: "/patrolRecords"})
+            },
+
+            // 扫码回调和点击扫码方法
+            scanValueCallback (stringValue) {
+                if (stringValue) {
+                    try {
+                        let temporaryMessage = this.scanPhotoAndroidMessage;
+                        // 取扫码后的科室id
+                        temporaryMessage['value'] = stringValue.split('|')[0];
+                        temporaryMessage['isScanCode'] = true;
+                        this.storeScanPhotoAndroidMessage(temporaryMessage);
+                        this.$router.push({ path: "/submitRecords"})
+                    } catch (err) {
+                        this.$toast({
+                            message: `${err}`,
+                            type: 'fail'
+                        })
+                    }
+                } else {
+                    this.$toast({
+                        message: '没有扫描到任何信息!',
+                        type: 'fail'
+                    })
+                }
+            },
+
+            // 点击拍照方法
+            takePhotosValueCallback (stringValue) {
+                if (stringValue) {
+                    let temporaryMessage = this.scanPhotoAndroidMessage;
+                    temporaryMessage['value'] = stringValue;
+                    temporaryMessage['isScanCode'] = false;
+                    this.storeScanPhotoAndroidMessage(temporaryMessage);
+                    this.$router.push({ path: "/submitRecords"})
+                } else {
+                    this.$toast({
+                        message: '拍照无效!',
+                        type: 'fail'
+                    })
+                }
             },
 
 
@@ -102,7 +175,8 @@
                 if (item.name == '考勤管理') {
                     this.$router.push({path: '/attendanceStatistics'})
                 } else if (item.name == '扫码巡查') {
-                    this.$router.push({path: '/scanQRCode'})
+                    // 跳到安卓扫码页面
+                    window.android.openScanPage()
                 }
             }
         }

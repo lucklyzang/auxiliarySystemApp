@@ -23,7 +23,7 @@
             <span>你的记录已经提交成功,可到巡查记录查看详情!</span>
         </div>
         <div class="task-operation-box">
-            <div class="task-no-complete" @click="backPhoto">返回拍照</div>
+            <div class="task-no-complete" @click="backPhoto">{{ currentText }}</div>
             <div class="task-complete" @click="viewRecords">查看记录</div>
         </div>
     </div>
@@ -43,6 +43,7 @@ export default {
   data() {
     return {
       loadingShow: false,
+      currentText: '',
       overlayShow: false,
       emptyShow: false,
       successPng: require("@/common/images/home/success.png")
@@ -55,11 +56,19 @@ export default {
 
   mounted() {
     // 控制设备物理返回按键
-    this.deviceReturn("/submitRecords")
+    this.deviceReturn("/submitRecords");
+    if (this.scanPhotoAndroidMessage['isScanCode']) {
+    // 跳到扫码界面
+      this.currentText = '返回扫码';
+      window.android.openScanPage()
+    } else if (!this.scanPhotoAndroidMessage['isScanCode']) {
+      // 跳到拍照界面
+      this.currentText = '返回拍照'
+    }
   },
 
   computed: {
-    ...mapGetters(["userInfo"])
+    ...mapGetters(["userInfo","scanPhotoAndroidMessage"])
   },
 
   methods: {
@@ -70,7 +79,13 @@ export default {
 
     // 返回拍照事件
     backPhoto () {
-        this.$router.push({path: "/scanQRCode"})
+      if (this.scanPhotoAndroidMessage['isScanCode']) {
+      // 跳到扫码界面
+        window.android.openScanPage()
+      } else if (!this.scanPhotoAndroidMessage['isScanCode']) {
+        // 跳到拍照界面
+        window.android.openPhotographPage()
+      }
     },
 
     // 查看记录事件

@@ -3,12 +3,12 @@
     <van-overlay :show="overlayShow" />
     <van-loading size="35px" vertical color="#e6e6e6" v-show="loadingShow">{{ loadText }}</van-loading>
     <div class="nav">
-      <NavBar path="/scanQRCode" title="拍照详情" />
+      <NavBar path="/scanQRCode" :title="currentTitle" />
     </div>
     <div class="content">
-      <div class="location-box">
+      <div class="location-box" v-if="isShowLocation">
         <van-icon name="location" color="#1864FF" size="25" />
-        <span>科室一</span>
+        <span>{{ departmentName }}</span>
       </div>
       <div class="result-picture">
         <div>
@@ -94,7 +94,7 @@ import NavBar from "@/components/NavBar";
 import {addPatrolRecords} from "@/api/auxiliarySystem.js";
 import { mapGetters, mapMutations } from "vuex";
 import {mixinsDeviceReturn} from '@/mixins/deviceReturnFunction';
-import { compress,base64ImgtoFile } from "@/common/js/utils";
+import { compress,base64ImgtoFile,IsPC } from "@/common/js/utils";
 import {getAliyunSign} from '@/api/login.js'
 import axios from 'axios'
 export default {
@@ -106,12 +106,15 @@ export default {
   data() {
     return {
       photoBox: false,
+      isShowLocation: false,
       imgIndex: '',
+      currentTitle: '',
       radioValue: '1',
       deleteInfoDialogShow: false,
       overlayShow: false,
       isExpire: false,
       loadingShow: false,
+      departmentName: '',
       loadText: '创建中',
       enterRemark: "",
       resultImgList: [],
@@ -121,17 +124,40 @@ export default {
 
   mounted() {
     // 控制设备物理返回按键
-    this.deviceReturn("/scanQRCode")
+    if (!IsPC()) {
+      let that = this;
+      pushHistory();
+      that.gotoURL(() => {
+        pushHistory();
+        if (that.scanPhotoAndroidMessage['isScanCode']) {
+          // 跳到扫码界面
+          window.android.openScanPage()
+        } else if (!that.scanPhotoAndroidMessage['isScanCode']) {
+          // 跳到拍照界面
+          window.android.openPhotographPage()
+        }
+      })
+    };
+    if (this.scanPhotoAndroidMessage['isScanCode']) {
+      this.currentTitle = '扫码详情';
+      this.isShowLocation = true;
+      this.departmentName = this.departmentsMessage.filter((item) => { return item.id == this.scanPhotoAndroidMessage['value']})[0]['name'];
+    } else if (!this.scanPhotoAndroidMessage['isScanCode']) {
+      this.currentTitle = '拍照详情';
+      this.isShowLocation = false;
+      // 接受并处理安卓传过来的图片文件流
+      this.disposeAndroidFile(this.scanPhotoAndroidMessage['value'])
+    }
   },
 
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo","timeMessage","ossMessage","locationMessage"]),
+    ...mapGetters(["userInfo","timeMessage","ossMessage","scanPhotoAndroidMessage","departmentsMessage"]),
   },
 
   methods: {
-    ...mapMutations(["changeIsLogin","changeTimeMessage","changeOssMessage","storeLocationMessage"]),
+    ...mapMutations(["changeTimeMessage","changeOssMessage"]),
 
     // 任务提交事件
     async submitEvent() {
@@ -158,13 +184,13 @@ export default {
         addPatrolRecords({
           workerId: this.userInfo.id, //当前登陆员工id
           workerName: this.userInfo.name, //当前登陆员工姓名
-          depId: '12', // 当前科室id
+          depId: this.scanPhotoAndroidMessage['value'], // 当前科室id
           type: this.radioValue,   // 类别 1-日常记录，2-问题记录'
           remark: this.enterRemark,  // 备注
           system: 5,   // 系统类型  固定传 5
-          depName: "敬佩是", // 当前科室名称
+          depName: this.departmentName, // 当前科室名称
           createName: this.userInfo.name, //当前登陆员工姓名
-          imgPath: this.imgOnlinePathArr, //仅回显已上传到阿里云的图片地址
+          imgPath: this.imgOnlinePathArr, //已上传到阿里云的图片地址
           modifyName: this.userInfo.name // 修改者 非必输
         })
         .then((res) => {
@@ -211,6 +237,7 @@ export default {
         function () {
           // 压缩图片
           let result = reader.result;
+          console.log('资源',result);
           let img = new Image();
           img.src = result;
           img.onload = function () {
@@ -219,6 +246,40 @@ export default {
             _this.photoBox = false;
             _this.overlayShow = false
           };
+        },
+        false
+      );
+      if (file) {
+        reader.readAsDataURL(file);
+      }
+    },
+
+    // 处理安卓传过来的图片流对象
+    disposeAndroidFile(file) {
+      let _this = this;
+      let reader = new FileReader();
+      let isLt2M = file.size / 1024 / 1024 < 16;
+      if (!isLt2M) {
+        this.$dialog
+          .alert({
+            message: "上传图片大小不能超过16MB!",
+            closeOnPopstate: true,
+          })
+          .then(() => {});
+        return;
+      };
+      reader.addEventListener(
+        "load",
+        function () {
+          // 压缩图片
+          let result = reader.result;
+          console.log('资源',result);
+          let img = new Image();
+          img.src = result;
+          img.onload = function () {
+            let src = compress(img);
+            _this.resultImgList.push(src)
+          }
         },
         false
       );
@@ -489,7 +550,6 @@ export default {
       padding: 10px 8px;
       margin: 0 auto;
       margin-top: 10px;
-      margin-bottom: 10px;
       box-sizing: border-box;
       display: flex;
       background: #fff;
@@ -532,6 +592,7 @@ export default {
     };
     .result-picture {
       padding: 14px 8px;
+      margin-top: 10px;
       box-sizing: border-box;
       display: flex;
       background: #fff;

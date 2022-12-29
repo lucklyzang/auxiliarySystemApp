@@ -66,13 +66,24 @@ export default {
   computed:{
     ...mapGetters([
       'isTokenExpired',
-      'isEnterLoginPageSource'
+      'isEnterLoginPageSource',
+      'scanPhotoAndroidMessage'
     ])
   },
 
   methods: {
     onClickLeft() {
-      this.$router.push({path: this.path})
+      if (this.path == '/scanQRCode') {
+        if (this.scanPhotoAndroidMessage['isScanCode']) {
+          // 跳到扫码界面
+          window.android.openScanPage()
+        } else if (!this.scanPhotoAndroidMessage['isScanCode']) {
+          // 跳到拍照界面
+          window.android.openPhotographPage()
+        }
+      } else {
+        this.$router.push({path: this.path})
+      }
     },
     onClickRight() {
     }
