@@ -242,6 +242,7 @@ export default {
           img.src = result;
           img.onload = function () {
             let src = compress(img);
+             console.log('压缩后的路劲',src);
             _this.resultImgList.push(src);
             _this.photoBox = false;
             _this.overlayShow = false
@@ -273,7 +274,6 @@ export default {
         function () {
           // 压缩图片
           let result = reader.result;
-          console.log('资源',result);
           let img = new Image();
           img.src = result;
           img.onload = function () {
