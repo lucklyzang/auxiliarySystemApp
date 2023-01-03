@@ -44,14 +44,22 @@
   },
 
   watch: {
-      curData: {
+    curData: {
         handler: function(newVal, oldVal) {
            this.current = this.datalist.filter((item) => { return item.value == newVal})[0]['text'];
         },
         deep: true
     },
+	itemData: {
+        handler: function(newVal, oldVal) {
+           this.datalist = newVal
+        },
+        deep: true
+    }
   },
+  
   created(){
+	  console.log('值',this.curData,this.itemData);
 		this.datalist = this.itemData;
         this.current = this.datalist.filter((item) => { return item.value == this.curData})[0]['text'];
 		//点击组件以外的地方，收起
@@ -80,7 +88,7 @@
 		clickItem(item){
 			this.current = this.datalist.filter((innerItem) => { return innerItem.value == item.value})[0]['text'];
 			this.isShow = false;
-			this.$emit('change',item);
+			this.$emit('change',item)
 		},
 	}
 }

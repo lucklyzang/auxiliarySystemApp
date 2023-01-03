@@ -50,6 +50,7 @@
         },
         data() {
             return {
+                transferShow: true,
                 cleaningManagementList: [
                     {
                         name: '考勤管理',
@@ -91,7 +92,6 @@
             window['takePhotosValueCallback'] = (stringValue) => {
 				me.takePhotosValueCallback(stringValue)
 			};
-            
         },
 
         watch: {},
@@ -112,6 +112,10 @@
 
             dropDownClick(e) {
 		        console.log(e)
+            },
+
+            sureEvent (val) {
+                console.log('确认值',val)
             },
 
             // 返回上一页
