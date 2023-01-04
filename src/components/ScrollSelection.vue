@@ -4,12 +4,12 @@
       v-if="show"
       class="picker"
     >
-      <section class="picker-main">
-        <h3>
-            {{ title }}
-            <van-icon name="cross" size="25" @click="show = false" />
+      <section class="picker-main" ref="pickerMain">
+        <h3 ref="chooseBox">
+          {{ title }}
+          <van-icon name="cross" size="25" @click="show = false" />
         </h3>
-        <div class="search-box" v-show="isShowSearch">
+        <div class="search-box" v-show="isShowSearch" ref="searchBox">
             <van-search
                 v-model="searchValue"
                 show-action
@@ -28,12 +28,12 @@
             :ref="'li'+item.id"
           >{{item.text}}</li>
         </ul>
-        <div class="button-box">
+        <div class="button-box" ref="buttonBox">
             <span @click="resetEvent" v-show="isShowReset">重置</span>
             <span @click="show = false" v-show="!isShowReset">取消</span>
             <span @click="sure()">确认</span>
         </div>
-        <van-empty description="暂无结果" v-show="list.length == 0" />
+        <van-empty description="暂无数据" v-show="list.length == 0" />
       </section>
     </div>
   </div>
@@ -45,27 +45,28 @@ export default {
   props:{
     // 顶部标题
     title: {
-        type: String,
-        default: '请选择'
+      type: String,
+      default: '请选择'
     },
-    // 滚动展示的数据
+    // 滚动展示的数据 格式[{id: '',text:''}]
     columns: {
-        type: Array,
-        default: []
+      type: Array,
+      default: []
     },
     // 是否显示搜索框
     isShowSearch: {
-        type: Boolean,
-        default: true
+      type: Boolean,
+      default: true
     },
     // 是否显示重置按钮
     isShowReset: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false
     }
   }, 
   data() {
     return {
+      isClickSearch: false,
       searchValue: '',
       cacheList: '',
       list: [],
@@ -80,9 +81,12 @@ export default {
    watch: {
       columns: {
         handler: function(newVal, oldVal) {
+          // 点击搜索时不进行监听
+          if (!this.isClickSearch) {
             this.list = this.columns;
             this.cacheList = this.list;  
             this.showPicker()
+          }
         },
         deep: true
     },
@@ -98,6 +102,7 @@ export default {
 
     // 搜索事件
     onSearch(val) {
+      this.isClickSearch = true;
       this.list = this.cacheList.filter((item) => { return item.text.indexOf(this.searchValue) != -1});
       this.list.map((item,index) => { item.id = index });
       this.showPicker()
@@ -126,7 +131,8 @@ export default {
     sure() {
       this.list.map((item, index) => {
         item.id == this.active ? (this.city = item.text) : null;
-        this.$emit('sure',this.city)
+        this.$emit('sure',this.city);
+        console.log('城市',this.city)
       });
       this.show = false;
     },
@@ -141,13 +147,16 @@ export default {
 
     computeActive() {
       let scroll = this.$refs.ul;
+      let buttonBoxHeight = this.$refs.buttonBox.offsetHeight;
+      let searchBoxHeight = this.$refs.searchBox.offsetHeight;
+      let chooseBoxHeight = this.$refs.chooseBox.offsetHeight;
       scroll.addEventListener("scroll", () => {
         this.listOffsetTop.map((item, index) => {
          let currentTop = '';
          if (this.isShowSearch) {
-            currentTop = scroll.scrollTop + 174
+            currentTop = scroll.scrollTop + buttonBoxHeight + searchBoxHeight + chooseBoxHeight + 20
          } else {
-            currentTop = scroll.scrollTop + 120
+            currentTop = scroll.scrollTop + buttonBoxHeight + chooseBoxHeight + 20
          };
         item <= currentTop ? (this.active = index) : null
         })
@@ -190,6 +199,7 @@ export default {
       justify-content: space-around;
       font-size: 18px;
       line-height: 40px;
+      height: 40px;
       position: relative;
       /deep/ .van-icon {
         position: absolute;

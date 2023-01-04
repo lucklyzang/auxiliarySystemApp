@@ -91,7 +91,7 @@
             // 点击拍照方法
             window['takePhotosValueCallback'] = (stringValue) => {
 				me.takePhotosValueCallback(stringValue)
-			};
+			}
         },
 
         watch: {},
