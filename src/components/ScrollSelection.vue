@@ -199,6 +199,7 @@ export default {
       justify-content: space-around;
       font-size: 18px;
       line-height: 40px;
+      color: #101010;
       height: 40px;
       position: relative;
       /deep/ .van-icon {
@@ -214,7 +215,8 @@ export default {
                 border-radius: 20px
             };
             .van-search__action {
-                color: #1b9dff
+              color: #3B9DF9;
+              font-size: 14px
             }
         }
     };
@@ -271,7 +273,7 @@ export default {
 }
 .active {
   background-color: #f3f3f3 !important;
-  color: #1b9dff
+  color: #3B9DF9
 }
 .active2 {
   color: #101010
