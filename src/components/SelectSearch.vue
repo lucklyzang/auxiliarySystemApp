@@ -31,7 +31,7 @@
 		}
   },
   props:{
-		curData:String | Number,	// 当前选中数据
+		curData:String | Number | null,	// 当前选中数据
 		itemData:Array,	// 所有选项数据
 		isNeedSearch:{	// 是否需要搜索
 			type: Boolean,
@@ -90,6 +90,12 @@
 			this.isShow = false;
 			this.$emit('change',item)
 		},
+
+		//供父组件调用的清除选择框值的方法
+		clearSelectValue () {
+			this.current = '请选择';
+			this.$emit('change',{text:'请选择',value: null})
+		}
 	}
 }
 </script>
@@ -99,7 +105,6 @@
     @import "~@/common/stylus/mixin.less";
     @import "~@/common/stylus/modifyUi.less";
 	.vue-dropdown {
-		z-index:10;
 		width: 100%;
 		border-radius:3px; 
 		border: 1px solid #ccc;
@@ -155,6 +160,7 @@
 	}
 	.list-and-search{
 		display: none;
+		z-index: 100;
 		background: #fff;
 		border: 1px solid #ccc;
 		position: absolute;
