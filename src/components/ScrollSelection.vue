@@ -7,7 +7,7 @@
       <section class="picker-main" ref="pickerMain">
         <h3 ref="chooseBox">
           {{ title }}
-          <van-icon name="cross" size="25" @click="show = false" />
+          <van-icon name="cross" size="25" @click="close" />
         </h3>
         <div class="search-box" v-show="isShowSearch" ref="searchBox">
             <van-search
@@ -30,8 +30,8 @@
         </ul>
         <div class="button-box" ref="buttonBox">
             <span @click="resetEvent" v-show="isShowReset">重置</span>
-            <span @click="show = false" v-show="!isShowReset">取消</span>
-            <span @click="sure()">确认</span>
+            <span @click="cancel" v-show="!isShowReset">取消</span>
+            <span @click="sure">确认</span>
         </div>
         <van-empty description="暂无数据" v-show="list.length == 0" />
       </section>
@@ -95,7 +95,7 @@ export default {
   mounted () {
     this.list = this.columns;
     this.cacheList = this.list;  
-    this.showPicker();
+    this.showPicker()
   },
 
   methods: {
@@ -124,6 +124,8 @@ export default {
         clearTimeout(this.timer);
         this.getOffsetTop();
         this.computeActive();
+        this.list = this.cacheList.filter((item) => { return item.text.indexOf(this.searchValue) != -1});
+        this.list.map((item,index) => { item.id = index });
       }, 50);
     },
 
@@ -131,10 +133,25 @@ export default {
     sure() {
       this.list.map((item, index) => {
         item.id == this.active ? (this.city = item.text) : null;
-        this.$emit('sure',this.city);
-        console.log('城市',this.city)
+        this.$emit('sure',this.city)
       });
-      this.show = false;
+      // 没有搜索结果时点确认
+      if (this.list.length == 0) {
+        this.$emit('sure',null)
+      };
+      this.show = false
+    },
+
+    // 关闭事件
+    close () {
+      this.$emit('close',this.city);
+      this.show = false
+    },
+
+    // 取消事件
+    cancel() {
+      this.$emit('cancel',this.city);
+      this.show = false
     },
 
     getOffsetTop() {
@@ -175,6 +192,7 @@ export default {
   left: 0;
   bottom: 0;
   right: 0;
+  z-index: 1000;
   display: flex;
   .picker-main {
     width: 100%;
