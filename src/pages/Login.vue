@@ -1,7 +1,9 @@
 <template>
   <div class="container">
-    <van-loading size="35px" vertical color="#e6e6e6" v-show="loadingShow">登录中...</van-loading>
-    <van-overlay :show="overlayShow" />
+    <van-loading size="35px" vertical color="#e6e6e6" v-show="loadingShow">{{ loadingText }}</van-loading>
+    <div class="overlay-box">
+      <van-overlay :show="overlayShow" />
+    </div>
     <div class="container-content">
       <img :src="loginBackgroundPng" />
       <div class="title">
@@ -46,12 +48,6 @@
         @confirm="dialongSure"
       >
         <div class="task-content">
-          <!-- <van-dropdown-menu 
-            active-color="#1864FF"
-            z-index="40000"
-          >
-            <van-dropdown-item get-container="getContainer" v-model="hospitalValue" :options="hospitalOption" @change="hospitalOptionChange" />
-          </van-dropdown-menu> -->
           <SelectSearch :isNeedSearch="false" :itemData="hospitalOption" @change="hospitalOptionChange" />  
         </div>
       </van-dialog>
@@ -74,11 +70,11 @@ export default {
     return {
       username: "",
       password: "",
+      loadingText: '登录中...',
       dialogShow: false,
       loadingShow: false,
       overlayShow: false,
       checked: false,
-      hospitalValue: null,
       selectValue: '',
       hospitalOption: [],
       loginBackgroundPng: require("@/common/images/login/login-background.png"),
@@ -153,6 +149,7 @@ export default {
         username: this.username,
         password: this.password
       };
+      this.loadingText = '登录中...';
       this.loadingShow = true;
       this.overlayShow = true;
 			logIn(qs.stringify(loginMessage)).then((res) => {
@@ -183,6 +180,7 @@ export default {
           };
           this.dialogShow = true;
         } else {
+          this.loadingText = '';
           this.$toast({
             type: 'fail',
             message: res.msg
@@ -190,6 +188,7 @@ export default {
         }
       })
       .catch((err) => {
+        this.loadingText = '';
         this.loadingShow = false;
         this.overlayShow = false;
         this.$toast({
@@ -201,6 +200,7 @@ export default {
     
     // 查询医院信息
     queryHospitalMessage (proId) {
+      this.loadingText = '加载中...';
       this.loadingShow = true;
       this.overlayShow = true;
       getHospitalMessage(proId).then((res) => {
@@ -210,6 +210,7 @@ export default {
           this.changeHospitalMessage(res.data.data);
           this.queryDepartmentsMessage(proId)
         } else {
+          this.loadingText = '';
           this.$toast({
             type: 'fail',
             message: res.msg
@@ -217,6 +218,7 @@ export default {
         }
       })
       .catch((err) => {
+        this.loadingText = '';
         this.loadingShow = false;
         this.overlayShow = false;
          this.$toast({
@@ -228,6 +230,7 @@ export default {
 
     // 查询科室信息
     queryDepartmentsMessage (proId) {
+      this.loadingText = '加载中...';
       this.loadingShow = true;
       this.overlayShow = true;
       getDepartmentsMessage({
@@ -241,6 +244,7 @@ export default {
           console.log('科室信息',this.departmentsMessage);
           this.$router.push({ path: "/home" })
         } else {
+          this.loadingText = '';
           this.$toast({
             type: 'fail',
             message: res.msg
@@ -248,6 +252,7 @@ export default {
         }
       })
       .catch((err) => {
+        this.loadingText = '';
         this.loadingShow = false;
         this.overlayShow = false;
          this.$toast({
@@ -256,8 +261,6 @@ export default {
         })
       })
     }
-
-    
   }
 }
 </script>
@@ -266,6 +269,14 @@ export default {
 @import "~@/common/stylus/mixin.less";
 @import "~@/common/stylus/modifyUi.less";
 .container {
+  .overlay-box {
+    /deep/ .van-overlay {
+      z-index: 20002 !important
+    }
+  };  
+  /deep/ .van-loading {
+    z-index: 30000 !important
+  };
   /deep/ .van-popup {
     z-index: 300000 !important
   };
@@ -305,41 +316,7 @@ export default {
                 }
               }
             }
-          };
-          // .task-content {
-          //   /deep/ .van-dropdown-menu {
-          //     .van-dropdown-menu__bar {
-          //       box-shadow: none;
-          //       background: none;
-          //       height: 35px;
-          //       .van-dropdown-menu__item {
-          //         justify-content: flex-start;
-          //         .van-dropdown-menu__title {
-          //           position: relative;
-          //           padding: 0 6px;
-          //           font-size: 14px;
-          //           box-sizing: border-box;
-          //           width: 100%;
-          //           display: inline-block
-          //         };
-          //         .van-dropdown-menu__title::after {
-          //           right: 10px
-          //         }
-          //       }
-          //     };
-          //     .van-dropdown-item {
-          //       top: 71px !important;
-          //       .van-dropdown-item__content {
-          //         .van-cell {
-          //           padding: 8px 6px !important;
-          //           .van-cell__title {
-          //             padding: 0 6px !important;
-          //           }
-          //         }
-          //       }
-          //     }
-          //   }
-          // }
+          }
         };
         .van-dialog__footer {
           justify-content: center;
