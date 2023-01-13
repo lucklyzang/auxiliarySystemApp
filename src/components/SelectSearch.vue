@@ -1,7 +1,7 @@
 <template>
 	<div class="vue-dropdown">
 		<div class="cur-name" @click="curNameClickEvent">
-            <span>{{current}}</span>
+            <span :class="{'spanStyle': current == '请选择医院'}">{{current}}</span>
             <van-icon :name="isShow ? 'arrow-down':'arrow-up'" size="16" />
         </div>
 		<div class="list-and-search" :class="isShow?'on':''">
@@ -186,6 +186,9 @@
             box-sizing: border-box;
             .no-wrap()
         };
+		.spanStyle {
+			color: #dadada !important
+		};
         /deep/ .van-icon {
             position: relative;
         };

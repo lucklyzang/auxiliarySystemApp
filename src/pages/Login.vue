@@ -42,15 +42,17 @@
         width="98%"
         :before-close="beforeCloseEvent"
         close-on-click-overlay
+        confirm-button-text="确定"
         @confirm="dialongSure"
       >
         <div class="task-content">
-          <van-dropdown-menu 
+          <!-- <van-dropdown-menu 
             active-color="#1864FF"
             z-index="40000"
           >
             <van-dropdown-item get-container="getContainer" v-model="hospitalValue" :options="hospitalOption" @change="hospitalOptionChange" />
-          </van-dropdown-menu>
+          </van-dropdown-menu> -->
+          <SelectSearch :isNeedSearch="false" :itemData="hospitalOption" @change="hospitalOptionChange" />  
         </div>
       </van-dialog>
     </div>   
@@ -61,8 +63,12 @@
 import { mapGetters, mapMutations } from "vuex";
 import {logIn,getHospitalMessage,getDepartmentsMessage} from '@/api/login.js'
 import { IsPC, setStore,  getStore, removeStore} from "@/common/js/utils";
+import SelectSearch from "@/components/SelectSearch";
 import qs from 'qs'
 export default {
+  components:{
+    SelectSearch
+  },
   name: "Login",
   data() {
     return {
@@ -138,7 +144,7 @@ export default {
 
     // 医院列表选值值变化事件
     hospitalOptionChange (value) {
-      this.selectValue = value
+      this.selectValue = value['value']
     },
 
     // 登录事件
@@ -271,49 +277,69 @@ export default {
         transform: translate3d(0,-50%,0) !important;
         .van-dialog__header {
           text-align: left;
-          padding: 5px 0;
+          padding: 8px 0;
           padding-left: 10px;
+          font-size: 15px;
           background: #f5f5f5;
         };
         .van-dialog__content {
           min-height: 300px;
           overflow: auto;
-          padding: 0 6px 6px 6px !important;
+          padding: 10px 20px 0 20px !important;
           box-sizing: border-box;
           .task-content {
-            /deep/ .van-dropdown-menu {
-              .van-dropdown-menu__bar {
-                box-shadow: none;
-                background: none;
-                height: 35px;
-                .van-dropdown-menu__item {
-                  justify-content: flex-start;
-                  .van-dropdown-menu__title {
-                    position: relative;
-                    padding: 0 6px;
-                    font-size: 14px;
-                    box-sizing: border-box;
-                    width: 100%;
-                    display: inline-block
-                  };
-                  .van-dropdown-menu__title::after {
-                    right: 10px
-                  }
+            .vue-dropdown {
+              border: 1px solid #e7e7e7 !important;
+              .cur-name {
+                >span {
+                  text-align: center
+                };
+                .van-icon {
+                  color: #e7e7e7 !important
                 }
               };
-              .van-dropdown-item {
-                top: 71px !important;
-                .van-dropdown-item__content {
-                  .van-cell {
-                    padding: 8px 6px !important;
-                    .van-cell__title {
-                      padding: 0 6px !important;
-                    }
-                  }
+              .list-and-search {
+                border: 1px solid #e7e7e7 !important;
+                .list-module {
+                  color: #656565 !important
                 }
               }
             }
-          }
+          };
+          // .task-content {
+          //   /deep/ .van-dropdown-menu {
+          //     .van-dropdown-menu__bar {
+          //       box-shadow: none;
+          //       background: none;
+          //       height: 35px;
+          //       .van-dropdown-menu__item {
+          //         justify-content: flex-start;
+          //         .van-dropdown-menu__title {
+          //           position: relative;
+          //           padding: 0 6px;
+          //           font-size: 14px;
+          //           box-sizing: border-box;
+          //           width: 100%;
+          //           display: inline-block
+          //         };
+          //         .van-dropdown-menu__title::after {
+          //           right: 10px
+          //         }
+          //       }
+          //     };
+          //     .van-dropdown-item {
+          //       top: 71px !important;
+          //       .van-dropdown-item__content {
+          //         .van-cell {
+          //           padding: 8px 6px !important;
+          //           .van-cell__title {
+          //             padding: 0 6px !important;
+          //           }
+          //         }
+          //       }
+          //     }
+          //   }
+          // }
         };
         .van-dialog__footer {
           justify-content: center;
@@ -322,8 +348,9 @@ export default {
           .van-dialog__confirm {
             width: 70px;
             height: 30px;
-            background: #1864FF;
+            background: #3b9df9;
             color: #fff;
+            font-size: 14px;
             flex: none;
             border-radius: 20px
           }
