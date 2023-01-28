@@ -162,6 +162,7 @@
 	}
 	.list-and-search{
 		display: none;
+		position: absolute;
 		z-index: 100;
 		background: #fff;
 		border: 1px solid #ccc;
