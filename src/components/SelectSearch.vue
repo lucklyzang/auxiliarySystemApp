@@ -1,7 +1,7 @@
 <template>
 	<div class="vue-dropdown">
 		<div class="cur-name" @click="curNameClickEvent">
-            <span :class="{'spanStyle': current == '请选择医院'}">{{current}}</span>
+            <span :class="{'spanStyle': current == datalist[0]['text']}">{{current}}</span>
             <van-icon :name="isShow ? 'arrow-down':'arrow-up'" size="16" />
         </div>
 		<div class="list-and-search" :class="isShow?'on':''">
@@ -10,7 +10,11 @@
                 <van-icon name="search" size="18" />
 			</div>
 			<ul class="list-module">
-				<li v-for ="(item,index) in datalist" @click="clickItem(item)" :key="index">
+				<li v-for ="(item,index) in datalist" @click="clickItem(item)" :key="index" 
+				:class="{'liStyle': (item.value == currentFullValue['value']) && currentFullValue['value'],
+					'liSelectItemStyle': index == 0
+					}
+				">
 					<span class="list-item-text">{{item.text}}</span>
 				</li>
 			</ul>
@@ -26,6 +30,7 @@
 		return {
 			searchValue: '',
 			current: '',
+			currentFullValue: null,
 			datalist:[],
 			isShow:false
 		}
@@ -46,7 +51,8 @@
   watch: {
     curData: {
         handler: function(newVal, oldVal) {
-           this.current = this.datalist.filter((item) => { return item.value == newVal})[0]['text'];
+           this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal})[0]['text'] : '';
+		   this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal})[0] : null
         },
         deep: true,
 		immediate: true
@@ -64,6 +70,7 @@
 	  console.log('值',this.curData,this.itemData);
 		this.datalist = this.itemData;
         this.current = this.datalist.filter((item) => { return item.value == this.curData})[0]['text'];
+		this.currentFullValue = this.datalist.filter((item) => { return item.value == this.curData})[0];
 		//点击组件以外的地方，收起
 		document.addEventListener('click', (e) => {
 			if (!this.$el.contains(e.target)){
@@ -89,6 +96,8 @@
         
 		clickItem(item){
 			this.current = this.datalist.filter((innerItem) => { return innerItem.value == item.value})[0]['text'];
+			this.currentFullValue = this.datalist.filter((innerItem) => { return innerItem.value == item.value})[0];
+			console.log('哈哈',this.currentFullValue);
 			this.isShow = false;
 			this.$emit('change',item)
 		},
@@ -96,6 +105,7 @@
 		//供父组件调用的清除选择框值的方法
 		clearSelectValue () {
 			this.current = this.datalist[0]['text'];
+			this.currentFullValue = this.datalist[0];
 			this.$emit('change',{text:this.datalist[0]['text'],value: null})
 		}
 	}
@@ -157,15 +167,21 @@
 					color: #fff;
 					background: #00a0e9;
 				}
+			};
+			.liStyle {
+				color: #3B9DF9 !important
+			};
+			.liSelectItemStyle {
+				color: #dadada !important
 			}
 		}
 	}
 	.list-and-search{
 		display: none;
-		position: absolute;
 		z-index: 100;
 		background: #fff;
 		border: 1px solid #ccc;
+		position: absolute;
         box-sizing: border-box;
 		width: 100%;
 		&.on{
