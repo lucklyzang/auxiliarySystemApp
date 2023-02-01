@@ -4,7 +4,7 @@
       v-if="show"
       class="picker"
     >
-      <section class="picker-main" ref="pickerMain">
+      <section class="picker-main" ref="pickerMain" :class="{'picker-box-activate': show,'picker-box-inertia': !show}">
         <h3 ref="chooseBox">
           {{ title }}
           <van-icon name="cross" size="25" @click="close" />
@@ -24,7 +24,7 @@
           <li
             v-for="(item, index) in list"
             :key="index"
-            :class="active==item.id?'active':active==item.id-1||active==item.id+1?'active2':null"
+            :class="{'active':active == item.id}"
             :ref="'li'+item.id"
           >{{item.text}}</li>
         </ul>
@@ -56,7 +56,7 @@ export default {
     // 是否显示搜索框
     isShowSearch: {
       type: Boolean,
-      default: true
+      default: false
     },
     // 是否显示重置按钮
     isShowReset: {
@@ -125,14 +125,14 @@ export default {
         this.getOffsetTop();
         this.computeActive();
         this.list = this.cacheList.filter((item) => { return item.text.indexOf(this.searchValue) != -1});
-        this.list.map((item,index) => { item.id = index });
-      }, 50);
+        this.list.map((item,index) => { item.id = index })
+      }, 50)
     },
 
     // 确认事件
     sure() {
       this.list.map((item, index) => {
-        item.id == this.active ? (this.city = item.text) : null;
+        item.id == this.active ? (this.city = item.text) : null
       });
       this.$emit('sure',this.city);
       // 没有搜索结果时点确认
@@ -158,7 +158,8 @@ export default {
       this.listOffsetTop = [];
       this.list.map((item, index) => {
         let liTop = this.$refs["li" + item.id];
-        this.listOffsetTop.push(liTop[0].offsetTop - 41)
+        this.listOffsetTop.push(liTop[0].offsetTop - liTop[0]['offsetHeight']);
+        console.log('偏移数据',this.listOffsetTop)
       });
     },
 
@@ -184,7 +185,7 @@ export default {
 </script>
 <style lang="less" scoped>
 .picker {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0,0,0,.7);
   max-height: 100vh;
   width: 100%;
   position: absolute;
@@ -247,6 +248,7 @@ export default {
       background-color: #fff;
       li {
         list-style: none;
+        color: #101010;
         font-size: 18px;
         line-height: 40px;
         text-align: center;
@@ -287,13 +289,24 @@ export default {
             }
         }
     }
+  };
+  // 渐出动画
+  .picker-box-activate {
+    transition: 0.6s all;
+    transform: translateY(0%);
+    opacity: 1;
+    visibility: visible
+  };
+  // 渐入动画
+  .picker-box-inertia {
+    transition: 0.6s all;
+    transform: translateY(100%);
+    opacity: 0;
+    visibility: hidden
   }
-}
+};  
 .active {
   background-color: #f3f3f3 !important;
-  color: #3B9DF9
-}
-.active2 {
-  color: #101010
+  color: #3B9DF9 !important
 }
 </style>
