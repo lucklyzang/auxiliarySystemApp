@@ -71,7 +71,7 @@ export default {
       cacheList: '',
       list: [],
       show: false,
-      active: 0,
+      active: null,
       city: "",
       listOffsetTop: [],
       timer: null
@@ -119,7 +119,7 @@ export default {
     // 初始化事件
     showPicker() {
       this.show = true;
-      this.active = 0;
+      this.active = null;
       this.timer = setTimeout(() => {
         clearTimeout(this.timer);
         this.getOffsetTop();
