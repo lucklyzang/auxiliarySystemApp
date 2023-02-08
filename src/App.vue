@@ -1,9 +1,7 @@
 <template>
   <div id="app">
      <transition :name="transitionName" mode="out-in">
-      <keep-alive include="AddTask">
         <router-view class="child-view"></router-view>
-      </keep-alive>
     </transition>
   </div>
 </template>

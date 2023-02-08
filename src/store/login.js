@@ -15,6 +15,7 @@ export default {
         },
 
         departmentsMessage:  (state) => {
+            state.departmentsMessage = JSON.parse(getStore('departmentsMessage')) ? JSON.parse(getStore('departmentsMessage')) : [];
             return state.departmentsMessage
         },
 
@@ -81,6 +82,7 @@ export default {
         // 保存科室信息
         changeDepartmentsMessage (state, playLoad) {
             if (playLoad && playLoad != 'null') {
+                setStore('departmentsMessage', playLoad);
                 state.departmentsMessage = playLoad
             }
         },

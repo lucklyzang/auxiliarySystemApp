@@ -8,7 +8,7 @@
     <div class="content">
       <div class="location-box" v-if="isShowLocation">
         <van-icon name="location" color="#1864FF" size="25" />
-        <span>{{ departmentName }}</span>
+        <span>{{ departmentName ? departmentName : '无' }}</span>
       </div>
       <div class="result-picture">
         <div>
@@ -94,7 +94,7 @@ import NavBar from "@/components/NavBar";
 import {addPatrolRecords} from "@/api/auxiliarySystem.js";
 import { mapGetters, mapMutations } from "vuex";
 import {mixinsDeviceReturn} from '@/mixins/deviceReturnFunction';
-import { compress,base64ImgtoFile,IsPC } from "@/common/js/utils";
+import { compress,base64ImgtoFile,IsPC,imageToBase64 } from "@/common/js/utils";
 import {getAliyunSign} from '@/api/login.js'
 import axios from 'axios'
 export default {
@@ -138,16 +138,18 @@ export default {
         }
       })
     };
-    if (this.scanPhotoAndroidMessage['isScanCode']) {
-      this.currentTitle = '扫码详情';
-      this.isShowLocation = true;
-      this.departmentName = this.departmentsMessage.filter((item) => { return item.id == this.scanPhotoAndroidMessage['value']})[0]['name'];
-    } else if (!this.scanPhotoAndroidMessage['isScanCode']) {
-      this.currentTitle = '拍照详情';
-      this.isShowLocation = false;
-      // 接受并处理安卓传过来的图片文件流
-      this.disposeAndroidFile(this.scanPhotoAndroidMessage['value'])
-    }
+    let me = this;
+    // 扫码回调和点击扫码方法
+    window['scanValueCallback'] = (stringValue) => {
+      me.scanValueCallback(stringValue)
+    };
+
+    // 点击拍照方法
+    window['takePhotosValueCallback'] = (stringValue) => {
+      me.takePhotosValueCallback(stringValue)
+    };
+
+    this.commonDisposeMethod()
   },
 
   watch: {},
@@ -157,15 +159,72 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["changeTimeMessage","changeOssMessage"]),
+    ...mapMutations(["changeTimeMessage","changeOssMessage","storeScanPhotoAndroidMessage"]),
+
+    // 公共处理方法
+    commonDisposeMethod () {
+      if (this.scanPhotoAndroidMessage['isScanCode']) {
+        this.currentTitle = '扫码详情';
+        this.isShowLocation = true;
+        this.departmentName = this.departmentsMessage.filter((item) => { return item.id == this.scanPhotoAndroidMessage['value']})[0]['name'];
+      } else if (!this.scanPhotoAndroidMessage['isScanCode']) {
+        this.currentTitle = '拍照详情';
+        this.isShowLocation = false;
+        // 接受并处理安卓传过来的图片文件流
+        this.disposeAndroidFile(this.scanPhotoAndroidMessage['value'])
+      }
+    },
+
+
+    // 扫码回调和点击扫码方法
+    scanValueCallback (stringValue) {
+        if (stringValue) {
+          try {
+            let temporaryMessage = this.scanPhotoAndroidMessage;
+            // 取扫码后的科室id
+            temporaryMessage['value'] = stringValue.split('|')[0];
+            temporaryMessage['isScanCode'] = true;
+            this.storeScanPhotoAndroidMessage(temporaryMessage);
+            this.commonDisposeMethod()
+          } catch (err) {
+            this.$toast({
+              message: `${err}`,
+              type: 'fail'
+            })
+          }
+        } else {
+          this.$toast({
+            message: '没有扫描到任何信息!',
+            type: 'fail'
+          })
+        }
+    },
+
+    // 点击拍照方法
+    takePhotosValueCallback (stringValue) {
+      if (stringValue) {
+        imageToBase64(stringValue);
+        let temporaryMessage = this.scanPhotoAndroidMessage;
+        temporaryMessage['value'] = base64ImgtoFile(stringValue); //安卓传的base64图片转换为file对象
+        temporaryMessage['isScanCode'] = false;
+        this.storeScanPhotoAndroidMessage(temporaryMessage);
+        this.commonDisposeMethod()
+      } else {
+        this.$toast({
+          message: '拍照无效!',
+          type: 'fail'
+        })
+      }
+    },
+
 
     // 任务提交事件
     async submitEvent() {
+      this.loadText ='提交中';
+      this.overlayShow = true;
+      this.loadingShow = true;
       // 上传图片到阿里云服务器
       if (this.resultImgList.length > 0) {
-        this.loadText ='提交中';
-        this.overlayShow = true;
-        this.loadingShow = true;
         for (let imgI of this.resultImgList) {
           if (Object.keys(this.timeMessage).length > 0) {
             // 判断签名信息是否过期
@@ -184,11 +243,11 @@ export default {
         addPatrolRecords({
           workerId: this.userInfo.id, //当前登陆员工id
           workerName: this.userInfo.name, //当前登陆员工姓名
-          depId: this.scanPhotoAndroidMessage['value'], // 当前科室id
+          depId: this.scanPhotoAndroidMessage['isScanCode'] ? this.scanPhotoAndroidMessage['value'] ? this.scanPhotoAndroidMessage['value'] : '' : '', // 当前科室id
           type: this.radioValue,   // 类别 1-日常记录，2-问题记录'
           remark: this.enterRemark,  // 备注
           system: 5,   // 系统类型  固定传 5
-          depName: this.departmentName, // 当前科室名称
+          depName: this.scanPhotoAndroidMessage['isScanCode'] ? this.departmentName ? this.departmentName : '' : '', // 当前科室名称
           createName: this.userInfo.name, //当前登陆员工姓名
           imgPath: this.imgOnlinePathArr, //已上传到阿里云的图片地址
           modifyName: this.userInfo.name // 修改者 非必输
@@ -196,6 +255,7 @@ export default {
         .then((res) => {
           this.overlayShow = false;
           this.loadingShow = false;
+          this.loadText ='';
           if (res && res.data.code == 200) {
             this.$router.push({path: '/submitSuccessfully'})
           } else {
@@ -208,18 +268,56 @@ export default {
         .catch((err) => {
           this.overlayShow = false;
           this.loadingShow = false;
+          this.loadText ='';
+          this.$toast({
+            message: `${err}`,
+            type: 'fail'
+          })
+        })
+      } else {
+        addPatrolRecords({
+          workerId: this.userInfo.id, //当前登陆员工id
+          workerName: this.userInfo.name, //当前登陆员工姓名
+          depId: this.scanPhotoAndroidMessage['isScanCode'] ? this.scanPhotoAndroidMessage['value'] ? this.scanPhotoAndroidMessage['value'] : '' : '', // 当前科室id
+          type: this.radioValue,   // 类别 1-日常记录，2-问题记录'
+          remark: this.enterRemark,  // 备注
+          system: 5,   // 系统类型  固定传 5
+          depName: this.scanPhotoAndroidMessage['isScanCode'] ? this.departmentName ? this.departmentName : '' : '', // 当前科室名称
+          createName: this.userInfo.name, //当前登陆员工姓名
+          imgPath: [], //已上传到阿里云的图片地址
+          modifyName: this.userInfo.name // 修改者 非必输
+        })
+        .then((res) => {
+          this.overlayShow = false;
+          this.loadingShow = false;
+          this.loadText ='';
+          if (res && res.data.code == 200) {
+            this.$router.push({path: '/submitSuccessfully'})
+          } else {
+            this.$toast({
+              message: `${res.data.msg}`,
+              type: 'fail'
+            })
+          }
+        })
+        .catch((err) => {
+          this.overlayShow = false;
+          this.loadingShow = false;
+          this.loadText ='';
           this.$toast({
             message: `${err}`,
             type: 'fail'
           })
         })
       }
+       
     },
 
 
     // 图片上传预览
     previewFileOne() {
       let file = document.getElementById("demo1").files[0];
+      console.log('图片文件流',file);
       let _this = this;
       let reader = new FileReader();
       let isLt2M = file.size / 1024 / 1024 < 16;
@@ -237,7 +335,6 @@ export default {
         function () {
           // 压缩图片
           let result = reader.result;
-          console.log('资源',result);
           let img = new Image();
           img.src = result;
           img.onload = function () {

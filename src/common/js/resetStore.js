@@ -21,7 +21,10 @@ export function getDefaultAuxiliaryModuleState() {
        personInfo: {},
        personnelStatisticsDetailsMessage: {},
        locationMessage: [],
-       scanPhotoAndroidMessage: {},
+       scanPhotoAndroidMessage: {
+            value: '',
+            isScanCode: true
+       },
        attendanceStatisticsSwitchMessage: {}
     }
 };

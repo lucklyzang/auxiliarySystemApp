@@ -36,6 +36,7 @@
   </div>
 </template>
 <script>
+    import { base64ImgtoFile,imageToBase64, createImg } from "@/common/js/utils";
     import NavBar from "@/components/NavBar";
     import {
     } from '@/api/auxiliarySystem.js'
@@ -120,7 +121,7 @@
 
             // 返回上一页
             returnMethod () {
-                this.$router.push({ path: "/home"})
+                this.$router.push({ path: "/home"});
             },
 
             // 查看巡查记录
@@ -156,7 +157,13 @@
             takePhotosValueCallback (stringValue) {
                 if (stringValue) {
                     let temporaryMessage = this.scanPhotoAndroidMessage;
-                    temporaryMessage['value'] = stringValue;
+                    temporaryMessage['value'] = base64ImgtoFile(createImg(stringValue)); //安卓传的base64图片转换为file对象
+                    this.$dialog
+          .alert({
+            message: `${base64ImgtoFile(createImg(stringValue))}`,
+            closeOnPopstate: true,
+          })
+          .then(() => {});
                     temporaryMessage['isScanCode'] = false;
                     this.storeScanPhotoAndroidMessage(temporaryMessage);
                     this.$router.push({ path: "/submitRecords"})

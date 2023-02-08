@@ -32,6 +32,7 @@
 <script>
 import NavBar from "@/components/NavBar";
 import {} from "@/api/auxiliarySystem.js";
+import { IsPC } from "@/common/js/utils";
 import { mapGetters, mapMutations } from "vuex";
 import {mixinsDeviceReturn} from '@/mixins/deviceReturnFunction';
 export default {
@@ -56,14 +57,19 @@ export default {
 
   mounted() {
     // 控制设备物理返回按键
-    this.deviceReturn("/submitRecords");
-    if (this.scanPhotoAndroidMessage['isScanCode']) {
-    // 跳到扫码界面
-      this.currentText = '返回扫码';
-      window.android.openScanPage()
-    } else if (!this.scanPhotoAndroidMessage['isScanCode']) {
-      // 跳到拍照界面
-      this.currentText = '返回拍照'
+    if (!IsPC()) {
+      let that = this;
+      pushHistory();
+      that.gotoURL(() => {
+        pushHistory();
+        if (that.scanPhotoAndroidMessage['isScanCode']) {
+          // 跳到扫码界面
+          window.android.openScanPage()
+        } else if (!that.scanPhotoAndroidMessage['isScanCode']) {
+          // 跳到拍照界面
+          window.android.openPhotographPage()
+        }
+      })
     }
   },
 
@@ -74,7 +80,13 @@ export default {
   methods: {
     ...mapMutations([]),
     onClickLeft() {
-      this.$router.push({path: "/submitRecords"})
+      if (this.scanPhotoAndroidMessage['isScanCode']) {
+          // 跳到扫码界面
+          window.android.openScanPage()
+        } else if (!this.scanPhotoAndroidMessage['isScanCode']) {
+          // 跳到拍照界面
+          window.android.openPhotographPage()
+        }
     },
 
     // 返回拍照事件

@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { Dialog } from 'vant';
 /**
  * 格式化当前时间
 */
@@ -273,6 +274,29 @@ export const checkEmptyArray = (currentArr) => {
   });
   return arr;
 }
+
+export const createImg = (url) => {
+  var image = new Image();
+  image['crossOrigin'] = 'anonymous'
+  image['src'] = url;
+  imageToBase64(image)
+};
+
+/* 
+  * 图片转为base64格式
+  * @param{String}
+*/
+
+export const imageToBase64 = (img) => {
+  var canvas = document.createElement("canvas");
+  canvas.width = img.width;
+  canvas.height = img.height;
+  var ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0, img.width, img.height);
+  var ext = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase();
+  var dataURL = canvas.toDataURL("image/jpeg" + ext);
+  return dataURL;
+};
 
 /* 
   * Base64编码转换图片
