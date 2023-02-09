@@ -1,5 +1,7 @@
 <template>
   <div class="page-box" ref="wrapper">
+    <van-overlay :show="overlayShow" />
+    <van-loading size="35px" vertical color="#e6e6e6" v-show="loadingShow">{{ loadText }}</van-loading>
     <div class="nav">
         <NavBar title="特殊辅助系统" :leftArrow="false" leftText="" />
     </div>
@@ -51,6 +53,9 @@
         },
         data() {
             return {
+                overlayShow: false,
+                loadingShow: false,
+                loadText: '加载中',
                 transferShow: true,
                 cleaningManagementList: [
                     {
@@ -140,39 +145,77 @@
                         this.storeScanPhotoAndroidMessage(temporaryMessage);
                         this.$router.push({ path: "/submitRecords"})
                     } catch (err) {
-                        this.$toast({
+                        this.$dialog
+                        .alert({
                             message: `${err}`,
-                            type: 'fail'
+                            closeOnPopstate: true,
                         })
+                        .then(() => {})
                     }
                 } else {
-                    this.$toast({
-                        message: '没有扫描到任何信息!',
-                        type: 'fail'
+                    this.$dialog
+                    .alert({
+                        message: "没有扫描到任何信息!",
+                        closeOnPopstate: true,
                     })
+                    .then(() => {});
                 }
             },
 
             // 点击拍照方法
             takePhotosValueCallback (stringValue) {
                 if (stringValue) {
-                    let temporaryMessage = this.scanPhotoAndroidMessage;
-                    temporaryMessage['value'] = base64ImgtoFile(createImg(stringValue)); //安卓传的base64图片转换为file对象
+                    try {
+                        this.loadText ='图片加载中';
+                        this.overlayShow = true;
+                        this.loadingShow = true;
+                        createImg("https://zhhq-zlgl.oss-cn-beijing.aliyuncs.com/test/20230209/16759091561884file.jpeg",this.disposeImgCallback); //用安卓传的图片路径创建图片
+                    } catch (err) {
+                        this.loadText ='';
+                        this.overlayShow = false;
+                        this.loadingShow = false;
+                        this.$dialog
+                        .alert({
+                            message: `${err}`,
+                            closeOnPopstate: true,
+                        })
+                        .then(() => {})
+                    }
+                } else {
                     this.$dialog
-          .alert({
-            message: `${base64ImgtoFile(createImg(stringValue))}`,
-            closeOnPopstate: true,
-          })
-          .then(() => {});
+                    .alert({
+                        message: "拍照无效!",
+                        closeOnPopstate: true,
+                    })
+                    .then(() => {})
+                }
+            },
+
+            // 用安卓传的图片路径创建图片后的回调处理
+            disposeImgCallback (value) {
+                this.loadText ='';
+                this.overlayShow = false;
+                this.loadingShow = false;
+                try {
+                    this.$dialog
+                    .alert({
+                        message: `${imageToBase64(value)}`,
+                        closeOnPopstate: true,
+                    })
+                    .then(() => {});
+                    let temporaryMessage = this.scanPhotoAndroidMessage;
+                    temporaryMessage['value'] = base64ImgtoFile(imageToBase64(value));  //图片转base64 base64转换为file对象
                     temporaryMessage['isScanCode'] = false;
                     this.storeScanPhotoAndroidMessage(temporaryMessage);
                     this.$router.push({ path: "/submitRecords"})
-                } else {
-                    this.$toast({
-                        message: '拍照无效!',
-                        type: 'fail'
+                } catch (err) {
+                    this.$dialog
+                    .alert({
+                        message: `${err}`,
+                        closeOnPopstate: true,
                     })
-                }
+                    .then(() => {})
+                 }
             },
 
 

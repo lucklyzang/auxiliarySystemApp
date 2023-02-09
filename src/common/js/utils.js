@@ -275,11 +275,13 @@ export const checkEmptyArray = (currentArr) => {
   return arr;
 }
 
-export const createImg = (url) => {
+export const createImg = (url,callback) => {
   var image = new Image();
   image['crossOrigin'] = 'anonymous'
   image['src'] = url;
-  imageToBase64(image)
+  image.onload = function () {
+    callback(image)
+  }
 };
 
 /* 
@@ -295,7 +297,7 @@ export const imageToBase64 = (img) => {
   ctx.drawImage(img, 0, 0, img.width, img.height);
   var ext = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase();
   var dataURL = canvas.toDataURL("image/jpeg" + ext);
-  return dataURL;
+  return dataURL
 };
 
 /* 

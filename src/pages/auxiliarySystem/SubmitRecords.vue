@@ -94,7 +94,7 @@ import NavBar from "@/components/NavBar";
 import {addPatrolRecords} from "@/api/auxiliarySystem.js";
 import { mapGetters, mapMutations } from "vuex";
 import {mixinsDeviceReturn} from '@/mixins/deviceReturnFunction';
-import { compress,base64ImgtoFile,IsPC,imageToBase64 } from "@/common/js/utils";
+import { compress,base64ImgtoFile,IsPC,imageToBase64,createImg } from "@/common/js/utils";
 import {getAliyunSign} from '@/api/login.js'
 import axios from 'axios'
 export default {
@@ -112,10 +112,10 @@ export default {
       radioValue: '1',
       deleteInfoDialogShow: false,
       overlayShow: false,
-      isExpire: false,
       loadingShow: false,
-      departmentName: '',
       loadText: '创建中',
+      isExpire: false,
+      departmentName: '',
       enterRemark: "",
       resultImgList: [],
       imgOnlinePathArr: []
@@ -187,34 +187,62 @@ export default {
             this.storeScanPhotoAndroidMessage(temporaryMessage);
             this.commonDisposeMethod()
           } catch (err) {
-            this.$toast({
-              message: `${err}`,
-              type: 'fail'
+            this.$dialog
+            .alert({
+                message: `${err}`,
+                closeOnPopstate: true,
             })
+            .then(() => {})
           }
         } else {
-          this.$toast({
-            message: '没有扫描到任何信息!',
-            type: 'fail'
+          this.$dialog
+          .alert({
+              message: '没有扫描到任何信息!',
+              closeOnPopstate: true,
           })
+          .then(() => {})
         }
     },
 
     // 点击拍照方法
     takePhotosValueCallback (stringValue) {
       if (stringValue) {
-        imageToBase64(stringValue);
+        try { 
+          createImg(stringValue,this.disposeImgCallback) //用安卓传的图片路径创建图片
+        } catch (err) {
+          this.$dialog
+            .alert({
+                message: `${err}`,
+                closeOnPopstate: true,
+            })
+            .then(() => {})
+        } 
+      } else {
+        this.$dialog
+            .alert({
+                message: '拍照无效!',
+                closeOnPopstate: true,
+            })
+            .then(() => {})
+      }
+    },
+
+    // 用安卓传的图片路径创建图片后的回调处理
+    disposeImgCallback (value) {
+      try {
         let temporaryMessage = this.scanPhotoAndroidMessage;
-        temporaryMessage['value'] = base64ImgtoFile(stringValue); //安卓传的base64图片转换为file对象
+        temporaryMessage['value'] = base64ImgtoFile(imageToBase64(value));  //图片转base64 base64转换为file对象
         temporaryMessage['isScanCode'] = false;
         this.storeScanPhotoAndroidMessage(temporaryMessage);
         this.commonDisposeMethod()
-      } else {
-        this.$toast({
-          message: '拍照无效!',
-          type: 'fail'
-        })
-      }
+      } catch (err) {
+          this.$dialog
+            .alert({
+                message: `${err}`,
+                closeOnPopstate: true
+            })
+            .then(() => {})
+        }
     },
 
 

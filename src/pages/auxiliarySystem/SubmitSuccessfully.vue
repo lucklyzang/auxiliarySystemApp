@@ -70,7 +70,8 @@ export default {
           window.android.openPhotographPage()
         }
       })
-    }
+    };
+    this.commonDisposeMethod()
   },
 
   computed: {
@@ -87,6 +88,15 @@ export default {
           // 跳到拍照界面
           window.android.openPhotographPage()
         }
+    },
+
+    // 公共处理方法
+    commonDisposeMethod () {
+      if (this.scanPhotoAndroidMessage['isScanCode']) {
+        this.currentText = '返回扫码';
+      } else if (!this.scanPhotoAndroidMessage['isScanCode']) {
+        this.currentText = '返回拍照'
+      }
     },
 
     // 返回拍照事件
