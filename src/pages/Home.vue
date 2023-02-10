@@ -94,7 +94,12 @@
 				me.scanValueCallback(stringValue)
 			};
 
-            // 点击拍照方法
+            // 拍照回调方法(点击拍照按钮后)
+            window['startTakePhotosValueCallback'] = () => {
+				me.startTakePhotosValueCallback()
+			};
+
+            // 拍照回调方法(图片转为base64后)
             window['takePhotosValueCallback'] = (stringValue) => {
 				me.takePhotosValueCallback(stringValue)
 			}
@@ -162,25 +167,29 @@
                 }
             },
 
-            // 点击拍照方法
+            // 拍照回调方法(点击拍照按钮后)
+            startTakePhotosValueCallback() {
+                let temporaryMessage = this.scanPhotoAndroidMessage;
+                temporaryMessage['isScanCode'] = false;
+                temporaryMessage['overlayShow'] = true;
+                temporaryMessage['loadingShow'] = true;
+                temporaryMessage['isDisposeAndroidImg'] = false;
+                temporaryMessage['loadText'] = '图片加载中...';
+                this.storeScanPhotoAndroidMessage(temporaryMessage);
+                this.$router.push({ path: "/submitRecords"})
+            },
+
+            // 拍照回调方法(照片已经转为base64)
             takePhotosValueCallback (stringValue) {
                 if (stringValue) {
-                    try {
-                        this.loadText ='图片加载中';
-                        this.overlayShow = true;
-                        this.loadingShow = true;
-                        createImg("https://zhhq-zlgl.oss-cn-beijing.aliyuncs.com/test/20230209/16759091561884file.jpeg",this.disposeImgCallback); //用安卓传的图片路径创建图片
-                    } catch (err) {
-                        this.loadText ='';
-                        this.overlayShow = false;
-                        this.loadingShow = false;
-                        this.$dialog
-                        .alert({
-                            message: `${err}`,
-                            closeOnPopstate: true,
-                        })
-                        .then(() => {})
-                    }
+                    let temporaryMessage = this.scanPhotoAndroidMessage;
+                    temporaryMessage['isScanCode'] = false;
+                    temporaryMessage['value'] = base64ImgtoFile(stringValue);  //base64转换为file对象
+                    temporaryMessage['overlayShow'] = false;
+                    temporaryMessage['loadingShow'] = false;
+                    temporaryMessage['isDisposeAndroidImg'] = true;
+                    temporaryMessage['loadText'] = '';
+                    this.storeScanPhotoAndroidMessage(temporaryMessage)
                 } else {
                     this.$dialog
                     .alert({
@@ -189,33 +198,6 @@
                     })
                     .then(() => {})
                 }
-            },
-
-            // 用安卓传的图片路径创建图片后的回调处理
-            disposeImgCallback (value) {
-                this.loadText ='';
-                this.overlayShow = false;
-                this.loadingShow = false;
-                try {
-                    this.$dialog
-                    .alert({
-                        message: `${imageToBase64(value)}`,
-                        closeOnPopstate: true,
-                    })
-                    .then(() => {});
-                    let temporaryMessage = this.scanPhotoAndroidMessage;
-                    temporaryMessage['value'] = base64ImgtoFile(imageToBase64(value));  //图片转base64 base64转换为file对象
-                    temporaryMessage['isScanCode'] = false;
-                    this.storeScanPhotoAndroidMessage(temporaryMessage);
-                    this.$router.push({ path: "/submitRecords"})
-                } catch (err) {
-                    this.$dialog
-                    .alert({
-                        message: `${err}`,
-                        closeOnPopstate: true,
-                    })
-                    .then(() => {})
-                 }
             },
 
 

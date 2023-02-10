@@ -195,7 +195,8 @@ export default {
             border-radius: 30px;
             &:first-child {
                 color: #1684FC;
-                border: 1px solid #1684FC
+                border: 1px solid #1684FC;
+                margin-right: 10px
             };
             &:last-child {
                 color: #fff;

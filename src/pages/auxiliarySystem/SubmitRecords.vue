@@ -94,7 +94,7 @@ import NavBar from "@/components/NavBar";
 import {addPatrolRecords} from "@/api/auxiliarySystem.js";
 import { mapGetters, mapMutations } from "vuex";
 import {mixinsDeviceReturn} from '@/mixins/deviceReturnFunction';
-import { compress,base64ImgtoFile,IsPC,imageToBase64,createImg } from "@/common/js/utils";
+import { compress,base64ImgtoFile,IsPC } from "@/common/js/utils";
 import {getAliyunSign} from '@/api/login.js'
 import axios from 'axios'
 export default {
@@ -138,13 +138,19 @@ export default {
         }
       })
     };
+
     let me = this;
     // 扫码回调和点击扫码方法
     window['scanValueCallback'] = (stringValue) => {
       me.scanValueCallback(stringValue)
     };
 
-    // 点击拍照方法
+    // 拍照回调方法(点击拍照按钮后)
+    window['startTakePhotosValueCallback'] = () => {
+      me.startTakePhotosValueCallback()
+    };
+
+    // 拍照回调方法(图片转为base64后)
     window['takePhotosValueCallback'] = (stringValue) => {
       me.takePhotosValueCallback(stringValue)
     };
@@ -166,12 +172,19 @@ export default {
       if (this.scanPhotoAndroidMessage['isScanCode']) {
         this.currentTitle = '扫码详情';
         this.isShowLocation = true;
+        this.resultImgList = [];
         this.departmentName = this.departmentsMessage.filter((item) => { return item.id == this.scanPhotoAndroidMessage['value']})[0]['name'];
       } else if (!this.scanPhotoAndroidMessage['isScanCode']) {
         this.currentTitle = '拍照详情';
         this.isShowLocation = false;
+        this.overlayShow = this.scanPhotoAndroidMessage['overlayShow'];
+        this.loadingShow = this.scanPhotoAndroidMessage['loadingShow'];
+        this.loadText = this.scanPhotoAndroidMessage['loadText'];
         // 接受并处理安卓传过来的图片文件流
-        this.disposeAndroidFile(this.scanPhotoAndroidMessage['value'])
+        if (this.scanPhotoAndroidMessage['isDisposeAndroidImg']) {
+          this.resultImgList = [];
+          this.disposeAndroidFile(this.scanPhotoAndroidMessage['value'])
+        }
       }
     },
 
@@ -185,6 +198,7 @@ export default {
             temporaryMessage['value'] = stringValue.split('|')[0];
             temporaryMessage['isScanCode'] = true;
             this.storeScanPhotoAndroidMessage(temporaryMessage);
+            this.$router.push({ path: "/submitRecords"});
             this.commonDisposeMethod()
           } catch (err) {
             this.$dialog
@@ -204,47 +218,40 @@ export default {
         }
     },
 
-    // 点击拍照方法
+    // 拍照回调方法(点击拍照按钮后)
+    startTakePhotosValueCallback() {
+      let temporaryMessage = this.scanPhotoAndroidMessage;
+      temporaryMessage['isScanCode'] = false;
+      temporaryMessage['overlayShow'] = true;
+      temporaryMessage['loadingShow'] = true;
+      temporaryMessage['isDisposeAndroidImg'] = false;
+      temporaryMessage['loadText'] = '图片加载中...';
+      this.storeScanPhotoAndroidMessage(temporaryMessage);
+      this.$router.push({ path: "/submitRecords"});
+      this.commonDisposeMethod()
+    },
+
+    // 拍照回调方法(照片已经转为base64)
     takePhotosValueCallback (stringValue) {
       if (stringValue) {
-        try { 
-          createImg(stringValue,this.disposeImgCallback) //用安卓传的图片路径创建图片
-        } catch (err) {
-          this.$dialog
-            .alert({
-                message: `${err}`,
-                closeOnPopstate: true,
-            })
-            .then(() => {})
-        } 
-      } else {
-        this.$dialog
-            .alert({
-                message: '拍照无效!',
-                closeOnPopstate: true,
-            })
-            .then(() => {})
-      }
-    },
-
-    // 用安卓传的图片路径创建图片后的回调处理
-    disposeImgCallback (value) {
-      try {
         let temporaryMessage = this.scanPhotoAndroidMessage;
-        temporaryMessage['value'] = base64ImgtoFile(imageToBase64(value));  //图片转base64 base64转换为file对象
         temporaryMessage['isScanCode'] = false;
+        temporaryMessage['value'] = base64ImgtoFile(stringValue);  //base64转换为file对象
+        temporaryMessage['overlayShow'] = false;
+        temporaryMessage['loadingShow'] = false;
+        temporaryMessage['isDisposeAndroidImg'] = true;
+        temporaryMessage['loadText'] = '';
         this.storeScanPhotoAndroidMessage(temporaryMessage);
         this.commonDisposeMethod()
-      } catch (err) {
-          this.$dialog
-            .alert({
-                message: `${err}`,
-                closeOnPopstate: true
-            })
-            .then(() => {})
-        }
+      } else {
+        this.$dialog
+        .alert({
+            message: "拍照无效!",
+            closeOnPopstate: true,
+        })
+        .then(() => {})
+      }
     },
-
 
     // 任务提交事件
     async submitEvent() {
