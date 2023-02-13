@@ -169,45 +169,45 @@ export default {
 
     // 公共处理方法
     commonDisposeMethod () {
-      if (this.scanPhotoAndroidMessage['isScanCode']) {
-        this.currentTitle = '扫码详情';
-        this.isShowLocation = true;
-        this.resultImgList = [];
-        this.departmentName = this.departmentsMessage.filter((item) => { return item.id == this.scanPhotoAndroidMessage['value']})[0]['name'];
-      } else if (!this.scanPhotoAndroidMessage['isScanCode']) {
-        this.currentTitle = '拍照详情';
-        this.isShowLocation = false;
-        this.overlayShow = this.scanPhotoAndroidMessage['overlayShow'];
-        this.loadingShow = this.scanPhotoAndroidMessage['loadingShow'];
-        this.loadText = this.scanPhotoAndroidMessage['loadText'];
-        // 接受并处理安卓传过来的图片文件流
-        if (this.scanPhotoAndroidMessage['isDisposeAndroidImg']) {
+      try {
+        if (this.scanPhotoAndroidMessage['isScanCode']) {
+          this.currentTitle = '扫码详情';
+          this.isShowLocation = true;
           this.resultImgList = [];
-          this.disposeAndroidFile(this.scanPhotoAndroidMessage['value'])
+          this.departmentName = this.departmentsMessage.filter((item) => { return item.id == this.scanPhotoAndroidMessage['value']})[0]['name'];
+        } else if (!this.scanPhotoAndroidMessage['isScanCode']) {
+          this.currentTitle = '拍照详情';
+          this.isShowLocation = false;
+          this.overlayShow = this.scanPhotoAndroidMessage['overlayShow'];
+          this.loadingShow = this.scanPhotoAndroidMessage['loadingShow'];
+          this.loadText = this.scanPhotoAndroidMessage['loadText'];
+          // 接受并处理安卓传过来的图片文件流
+          if (this.scanPhotoAndroidMessage['isDisposeAndroidImg']) {
+            this.resultImgList = [];
+            this.disposeAndroidFile(this.scanPhotoAndroidMessage['value'])
+          }
         }
-      }
+      } catch(err) {
+        this.$dialog
+        .alert({
+          message: `${err}`,
+          closeOnPopstate: true,
+        })
+        .then(() => {})
+      }  
     },
 
 
     // 扫码回调和点击扫码方法
     scanValueCallback (stringValue) {
         if (stringValue) {
-          try {
-            let temporaryMessage = this.scanPhotoAndroidMessage;
-            // 取扫码后的科室id
-            temporaryMessage['value'] = stringValue.split('|')[0];
-            temporaryMessage['isScanCode'] = true;
-            this.storeScanPhotoAndroidMessage(temporaryMessage);
-            this.$router.push({ path: "/submitRecords"});
-            this.commonDisposeMethod()
-          } catch (err) {
-            this.$dialog
-            .alert({
-                message: `${err}`,
-                closeOnPopstate: true,
-            })
-            .then(() => {})
-          }
+          let temporaryMessage = this.scanPhotoAndroidMessage;
+          // 取扫码后的科室id
+          temporaryMessage['value'] = stringValue.split('|')[0];
+          temporaryMessage['isScanCode'] = true;
+          this.storeScanPhotoAndroidMessage(temporaryMessage);
+          this.$router.push({ path: "/submitRecords"});
+          this.commonDisposeMethod()
         } else {
           this.$dialog
           .alert({

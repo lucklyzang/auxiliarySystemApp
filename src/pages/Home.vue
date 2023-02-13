@@ -142,28 +142,19 @@
             // 扫码回调和点击扫码方法
             scanValueCallback (stringValue) {
                 if (stringValue) {
-                    try {
-                        let temporaryMessage = this.scanPhotoAndroidMessage;
-                        // 取扫码后的科室id
-                        temporaryMessage['value'] = stringValue.split('|')[0];
-                        temporaryMessage['isScanCode'] = true;
-                        this.storeScanPhotoAndroidMessage(temporaryMessage);
-                        this.$router.push({ path: "/submitRecords"})
-                    } catch (err) {
-                        this.$dialog
-                        .alert({
-                            message: `${err}`,
-                            closeOnPopstate: true,
-                        })
-                        .then(() => {})
-                    }
+                    let temporaryMessage = this.scanPhotoAndroidMessage;
+                    // 取扫码后的科室id
+                    temporaryMessage['value'] = stringValue.split('|')[0];
+                    temporaryMessage['isScanCode'] = true;
+                    this.storeScanPhotoAndroidMessage(temporaryMessage);
+                    this.$router.push({ path: "/submitRecords"})
                 } else {
                     this.$dialog
                     .alert({
                         message: "没有扫描到任何信息!",
                         closeOnPopstate: true,
                     })
-                    .then(() => {});
+                    .then(() => {})
                 }
             },
 
