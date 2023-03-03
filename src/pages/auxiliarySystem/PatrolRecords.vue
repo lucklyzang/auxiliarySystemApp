@@ -94,7 +94,7 @@
                         <img :src="item" alt="" v-for="(item,index) in item.imgPath" :key="index">
                       </div>
                       <div class="remark-box">
-                        <span>备注</span>
+                        <span>备注:</span>
                         <span>{{ item.remark }}</span>
                       </div>
                     </div>
