@@ -19,8 +19,8 @@
     <div class="content">
         <div class="text-info">
             <img :src="successPng" alt="">
-            <span>提交成功</span>
-            <span>你的记录已经提交成功,可到巡查记录查看详情!</span>
+            <span>提交成功!</span>
+            <span>您的记录已经提交成功,可到巡查记录查看详情!</span>
         </div>
         <div class="task-operation-box">
             <div class="task-no-complete" @click="backPhoto">{{ currentText }}</div>

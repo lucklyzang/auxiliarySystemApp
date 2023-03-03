@@ -55,13 +55,13 @@
                     </div>
                     <div class="personnel-statistics-content">
                       <div class="department-name">
-                        {{ item.depName }}
+                        {{ item.depName ? item.depName : '无' }}
                       </div>
                       <div class="img-list-box">
                         <img :src="item" alt="" v-for="(item,index) in item.imgPath" :key="index">
                       </div>
                       <div class="remark-box">
-                        <span>备注</span>
+                        <span>备注:</span>
                         <span>{{ item.remark }}</span>
                       </div>
                     </div>
@@ -80,7 +80,7 @@
                 <div class="personnel-statistics-list" v-for="(item,index) in problemsRecordsList" :key="index">
                     <div class="personnel-statistics-title">
                         <div class="personnel-statistics-title-left">
-                            {{ item.createTime }}
+                            {{ extractionDate(item.createTime) }}
                         </div>
                         <div class="personnel-statistics-title-right">
                             <span :class="{'spanStyle': item.type == 2}">{{ recordTypeTransition(item.type) }}</span>
@@ -211,6 +211,13 @@ export default {
             currentdate = currentDate.getFullYear() + seperator1 + month
         }
         return currentdate
+    },
+
+    // 提取时间(不显示秒)
+    extractionDate (dateMsg) {
+        if (!dateMsg) { return };
+        let currentIndex = dateMsg.lastIndexOf(':');
+        return dateMsg.substring(0,currentIndex)
     },
 
     onConMonthFirm() {

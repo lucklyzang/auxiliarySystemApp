@@ -188,12 +188,12 @@ export default {
           }
         }
       } catch(err) {
-        this.$dialog
-        .alert({
-          message: `${err}`,
-          closeOnPopstate: true,
-        })
-        .then(() => {})
+        // this.$dialog
+        // .alert({
+        //   message: `${err}`,
+        //   closeOnPopstate: true,
+        // })
+        // .then(() => {})
       }  
     },
 
