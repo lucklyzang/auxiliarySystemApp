@@ -80,7 +80,7 @@
                 <div class="personnel-statistics-list" v-for="(item,index) in problemsRecordsList" :key="index">
                     <div class="personnel-statistics-title">
                         <div class="personnel-statistics-title-left">
-                            {{ extractionDate(item.createTime) }}
+                            {{ item.createTime }}
                         </div>
                         <div class="personnel-statistics-title-right">
                             <span :class="{'spanStyle': item.type == 2}">{{ recordTypeTransition(item.type) }}</span>
