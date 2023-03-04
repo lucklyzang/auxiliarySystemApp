@@ -88,7 +88,7 @@
                     </div>
                     <div class="personnel-statistics-content">
                       <div class="department-name">
-                        {{ item.depName }}
+                        {{ item.depName ? item.depName : '无' }}
                       </div>
                       <div class="img-list-box">
                         <img :src="item" alt="" v-for="(item,index) in item.imgPath" :key="index">

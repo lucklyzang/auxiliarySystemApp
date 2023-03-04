@@ -294,6 +294,8 @@ export default {
           if (res && res.data.code == 200) {
             this.$router.push({path: '/submitSuccessfully'})
           } else {
+            // 添加记录失败后,清空之前成功上传到阿里云的图片,防止一张照片重复提交
+            this.imgOnlinePathArr = [];
             this.$toast({
               message: `${res.data.msg}`,
               type: 'fail'
@@ -304,6 +306,8 @@ export default {
           this.overlayShow = false;
           this.loadingShow = false;
           this.loadText ='';
+          // 添加记录失败后,清空之前成功上传到阿里云的图片,防止一张照片重复提交
+          this.imgOnlinePathArr = [];
           this.$toast({
             message: `${err}`,
             type: 'fail'
@@ -329,6 +333,8 @@ export default {
           if (res && res.data.code == 200) {
             this.$router.push({path: '/submitSuccessfully'})
           } else {
+            // 添加记录失败后,清空之前成功上传到阿里云的图片,防止一张照片重复提交
+            this.imgOnlinePathArr = [];
             this.$toast({
               message: `${res.data.msg}`,
               type: 'fail'
@@ -339,6 +345,8 @@ export default {
           this.overlayShow = false;
           this.loadingShow = false;
           this.loadText ='';
+          // 添加记录失败后,清空之前成功上传到阿里云的图片,防止一张照片重复提交
+          this.imgOnlinePathArr = [];
           this.$toast({
             message: `${err}`,
             type: 'fail'
