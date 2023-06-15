@@ -72,8 +72,9 @@ import { deepClone } from '@/common/js/utils'
     curData: {
         handler: function(newVal, oldVal) {
 		   //单选
+		   this.datalist = this.itemData;
 		   if (!this.multiple) {
-			 if (newVal == null || !isNaN(newVal)) {
+			 if (newVal == null || (!isNaN(newVal) && typeof Number(newVal) === 'number')) {
 				this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal})[0]['text'] : '';
 		   	 	this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal})[0] : null
 			 } else {
@@ -81,7 +82,6 @@ import { deepClone } from '@/common/js/utils'
 		   	 	this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal['value']})[0] : null
 			 }
 		   } else {
-			    this.datalist = this.itemData;
 			    if (newVal == null) {
 					this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == newVal})[0]['text'] : '';
 				} else {
@@ -138,7 +138,7 @@ import { deepClone } from '@/common/js/utils'
 		this.datalist = this.itemData;
 		//单选
 		if (!this.multiple) {
-			if (this.curData == null || !isNaN(this.curData )) {
+			if (this.curData == null || (!isNaN(this.curData) && typeof Number(this.curData) === 'number')) {
 				this.current = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData})[0]['text'] : '';
 				this.currentFullValue = this.datalist.length > 0 ? this.datalist.filter((item) => { return item.value == this.curData})[0] : null
 			} else {
